@@ -21,8 +21,8 @@ import { Attribution, defaults as defaultControls } from "ol/control";
 import { Circle as CircleStyle, Fill, Stroke, Style } from "ol/style";
 import { transform, fromLonLat } from "ol/proj";
 
-import { centerLon, centerLat, zoom, coordPrecision } from "../js/variables";
-import { targetProjection } from "../js/variables";
+import { centerLon, centerLat, zoom, coordPrecision } from "../utils/variables";
+import { targetProjection } from "../utils/variables";
 
 import { MapOptions } from "ol/PluggableMap";
 import { Coordinate } from "ol/coordinate";
