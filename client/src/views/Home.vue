@@ -1,19 +1,15 @@
 <template>
   <div>
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />
+    <h1>This is the Home page.</h1>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import HelloWorld from "@/components/HelloWorld.vue";
+import { defineComponent } from "vue"
 
 export default defineComponent({
-  name: "Home",
-  components: {
-    HelloWorld,
-  },
-});
+  name: "Home"
+})
 </script>
 
 <style lang="scss" scoped></style>

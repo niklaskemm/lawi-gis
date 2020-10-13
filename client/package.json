@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@types/ol": "^6.4.1",
     "core-js": "^3.6.5",
     "node-sass": "^4.14.1",
     "ol": "^6.4.3",

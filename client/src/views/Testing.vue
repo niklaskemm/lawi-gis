@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>This is the testing page.</h1>
+    <h1>TESTING</h1>
     <div class="map-container"><OLMap /></div>
   </div>
 </template>
@@ -12,8 +12,8 @@ import OLMap from "@/components/OLMap.vue";
 export default defineComponent({
   name: "Testing",
   components: {
-    OLMap,
-  },
+    OLMap
+  }
 });
 </script>
 
@@ -21,7 +21,7 @@ export default defineComponent({
 .map-container {
   position: absolute;
   left: 0;
-  height: 50vh;
   width: 100vw;
+  height: 75vh;
 }
 </style>
