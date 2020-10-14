@@ -1,4 +1,4 @@
-import { COORD_PRECISION_DICT } from "./const"
+import { COORD_PRECISION_DICT } from "./constants"
 
 export const centerLon = 10
 export const centerLat = 53.5
