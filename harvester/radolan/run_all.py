@@ -1,7 +1,7 @@
 from setup import setup
-from download import download_data
-from unpack import unpack_data
 from crop import crop_data
+from unpack import unpack_data
+from download import download_data
 from vectorize import vectorize_data
 
 

@@ -3,9 +3,9 @@ import urllib
 import geopandas
 
 from os import walk
-from shapely.ops import unary_union
-from datetime import datetime
 from tqdm import tqdm
+from datetime import datetime
+from shapely.ops import unary_union
 
 
 def get_buffer_shp():

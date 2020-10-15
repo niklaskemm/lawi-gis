@@ -1,5 +1,6 @@
-import gdal
 import os
+import gdal
+
 from gdal import ogr, osr
 from datetime import datetime
 from crop import create_filelist

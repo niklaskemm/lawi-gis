@@ -1,8 +1,9 @@
-import urllib.request
 import os
-from datetime import date, timedelta, datetime
+import urllib.request
+
 from tqdm import tqdm
 from pathlib import Path
+from datetime import date, timedelta, datetime
 
 
 def download_data():

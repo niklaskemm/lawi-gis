@@ -1,8 +1,8 @@
-# unpacking data
-import tarfile
-import gzip
 import os
+import gzip
 import shutil
+import tarfile
+
 from datetime import timedelta, date
 from download import download_data
 
