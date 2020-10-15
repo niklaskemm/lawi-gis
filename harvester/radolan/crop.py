@@ -33,7 +33,7 @@ def get_buffer_shp():
 def create_filelist():
     filelist = []
 
-    path = "./temp/radolan_unzipped"
+    path = "./temp/unpacked"
     for (_, dirnames, _) in walk(path):
         for dirname in dirnames:
             dpath = path + "/" + dirname
@@ -59,9 +59,9 @@ def crop_data():
         file_split = file.split("/")
         date_time_obj = datetime.strptime(
             file_split[len(file_split)-1], 'RW_%Y%m%d-%H%M.asc')
-        output = gdal.Warp(
-            "./temp/radolan_cropped/{}.tif".format(date_time_obj.strftime("%Y%m%d-%H%M")), file, options=options)
-        output = None
+        _ = gdal.Warp(
+            "./temp/cropped/{}.tif".format(date_time_obj.strftime("%Y%m%d-%H%M")), file, options=options)
+        _ = None
 
     print("Cropping complete.")
 

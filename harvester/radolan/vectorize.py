@@ -16,14 +16,14 @@ def vectorize_data():
         date_time_obj = datetime.strptime(
             file_split[len(file_split)-1], 'RW_%Y%m%d-%H%M.asc')
 
-        filename_input = "./temp/radolan_cropped/{}".format(
+        filename_input = "./temp/cropped/{}".format(
             date_time_obj.strftime("%Y%m%d-%H%M"))
-        filename_output = "./temp/radolan_vectorized/{}".format(
+        filename_output = "./temp/vectorized/{}".format(
             date_time_obj.strftime("%Y%m%d-%H%M"))
 
         source = gdal.Open(filename_input + ".tif")
         band = source.GetRasterBand(1)
-        bandArray = band.ReadAsArray()
+        _ = band.ReadAsArray()
 
         driver = ogr.GetDriverByName("ESRI Shapefile")
 
@@ -45,7 +45,7 @@ def vectorize_data():
 
         target.Destroy()
         source = None
-        bandArray = None
+        _ = None
 
     print("Vectorization complete.")
 

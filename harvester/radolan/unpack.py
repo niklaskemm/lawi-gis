@@ -8,23 +8,21 @@ from download import download_data
 from setup import setup_date
 
 
-def unzip_data(remove=True):
+def unpack_data():
 
     startdate, enddate = setup_date()
     date = startdate
 
-    print("Starting unzipping...")
+    print("Starting unpacking...")
     while date < enddate:
-        dest = './temp/radolan_zipped/RW-{}.tar.gz'.format(
+        dest = './temp/packed/RW-{}.tar.gz'.format(
             date.strftime("%Y%m%d"))
         with gzip.open(dest, 'rb') as f_in:
             with open(dest.split(".gz")[0], 'wb') as f_out:
                 shutil.copyfileobj(f_in, f_out)
-        if remove == True:
-            os.remove(dest)
 
         with tarfile.open(dest.split(".gz")[0], "r") as tar:
-            temp_path = "./temp/radolan_unzipped/RW-{}".format(
+            temp_path = "./temp/unpacked/RW-{}".format(
                 date.strftime("%Y%m%d"))
             if os.path.isdir(temp_path) == False:
                 os.mkdir(temp_path)
@@ -38,8 +36,8 @@ def unzip_data(remove=True):
 
         date += timedelta(days=1)
 
-    print("Data unzipped.")
+    print("Data unpacked.")
 
 
 if __name__ == "__main__":
-    unzip_data()
+    unpack_data()

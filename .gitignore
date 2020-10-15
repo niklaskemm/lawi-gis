@@ -1,7 +1,7 @@
 .DS_Store
 node_modules
 /dist
-
+temp
 
 # local env files
 .env.local
@@ -22,6 +22,5 @@ pnpm-debug.log*
 *.sln
 *.sw?
 
-# others
-
+# chached/compiled files
 *.pyc
