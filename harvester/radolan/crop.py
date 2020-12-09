@@ -55,7 +55,6 @@ def crop_data():
 
     print("Starting cropping...")
     for file in tqdm(filelist, unit=" files"):
-        # get the date from the filename
         file_split = file.split("/")
         date_time_obj = datetime.strptime(
             file_split[len(file_split)-1], 'RW_%Y%m%d-%H%M.asc')

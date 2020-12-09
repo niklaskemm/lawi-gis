@@ -1,0 +1,32 @@
+[x] update to WSL2
+[ ] set up database
+    [x] create and lauch AWS RDS
+    [ ] set up basic tables 
+        [ ] user
+        [ ] field
+[ ] develop basic API to interact with DB
+    [ ] basic form for user
+        [ ] configure Auth0 for login
+    [ ] implement OL draw functionality
+[ ] implement RADOLAN data upload to DB 
+    [ ] set up corresponding tables
+        [ ] gridgeom
+        [ ] radolan_data
+[ ] set up SQL to intersect data
+
+.
+.
+.
+
+[ ] implement soil data from the BGR .shp
+    [ ] set up soil_data table
+[ ] implement pesticide data
+    [ ] develop web scraper
+    [ ] upload data to DB
+
+.
+.
+.
+
+[ ] polish interface
+[ ] turn into PWA

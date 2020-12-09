@@ -12,7 +12,6 @@ def vectorize_data():
 
     print("Starting vectorization...")
     for file in tqdm(filelist, unit=" files"):
-        # get the date from the filename
         file_split = file.split("/")
         date_time_obj = datetime.strptime(
             file_split[len(file_split)-1], 'RW_%Y%m%d-%H%M.asc')
@@ -28,7 +27,6 @@ def vectorize_data():
 
         driver = ogr.GetDriverByName("ESRI Shapefile")
 
-        # remove if already exists
         if os.path.exists(filename_output + ".shp"):
             driver.DeleteDataSource(filename_output + ".shp")
 
