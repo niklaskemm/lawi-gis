@@ -1,9 +1,11 @@
+const bcrypt = require("bcryptjs")
+
 module.exports = (sequelize, DataTypes) => {
   var User = sequelize.define('user', {
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
-      primaryKey: true
+      primaryKey: true,
     },
     email: {
       type: DataTypes.STRING,
@@ -29,11 +31,18 @@ module.exports = (sequelize, DataTypes) => {
         len: [6,16],
         msg: "Password needs to be at atleast 6 characters in length and 16 at most."
       }
-    },
+    }
+  }, {
+    hooks: {
+      afterValidate: function (user) {
+        user.password = bcrypt.hashSync(user.password, 8)
+      }
+    }
   })
 
   User.associate = (models) => {
     User.belongsToMany(models.field, { through:"user_field" }
-    )}
+    )
+  }
   return User
 }
