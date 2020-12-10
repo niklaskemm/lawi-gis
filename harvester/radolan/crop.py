@@ -9,10 +9,7 @@ from shapely.ops import unary_union
 
 
 def get_buffer_shp():
-    urllib.request.urlretrieve(
-        "https://www.eea.europa.eu/data-and-maps/data/eea-reference-grids-2/gis-files/germany-shapefile/at_download/file", "./temp/germany.zip")
-
-    germany = geopandas.read_file("zip://./temp/germany.zip")
+    germany = geopandas.read_file("zip://./../germany.zip")
     germany = germany.to_crs("epsg:3857")
     germany_boundary = geopandas.GeoDataFrame(
         geopandas.GeoSeries(unary_union(germany['geometry'])))
@@ -44,16 +41,15 @@ def create_filelist():
 
 
 def crop_data():
-    get_buffer_shp()
+    print("Starting cropping...")
     filelist = create_filelist()
     options = gdal.WarpOptions(resampleAlg=gdal.GRA_NearestNeighbour,
                                format="GTiff",
-                               cutlineDSName='./temp/germany.shp',
+                               cutlineDSName='./../boundary_germany/germany.shp',
                                dstSRS="+proj=stere +lon_0=10.0 +lat_0=90.0 +lat_ts=60.0 +a=6370040 +b=6370040 +units=m",
                                srcSRS="+proj=stere +lon_0=10.0 +lat_0=90.0 +lat_ts=60.0 +a=6370040 +b=6370040 +units=m",
                                cropToCutline=True)
 
-    print("Starting cropping...")
     for file in tqdm(filelist, unit=" files"):
         file_split = file.split("/")
         date_time_obj = datetime.strptime(
