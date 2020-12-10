@@ -1,4 +1,5 @@
 import os
+import uuid
 import psycopg2
 import geopandas
 import psycopg2.extras
@@ -18,17 +19,17 @@ def export_data(values):
     db_username = os.getenv("DB_USERNAME")
     db_password = os.getenv("DB_PASSWORD")
     db_database = os.getenv("DB_DATABASE")
-    db_datatable = os.getenv("DB_DATATABLE")
+    # db_datatable = os.getenv("DB_DATATABLE")
 
     config = f"host='{db_server}' port={db_port} user='{db_username}' password='{db_password}' dbname='{db_database}'"
 
     with psycopg2.connect(config) as conn:
         with conn.cursor() as cur:
-            cur.execute(f"CREATE TABLE IF NOT EXISTS radolan_data;")
-            cur.execute(f"DELETE FROM {db_datatable};")
+            # cur.execute("CREATE TABLE IF NOT EXISTS radolan_data")
+            # cur.execute("DELETE FROM radolan_data")
             psycopg2.extras.execute_batch(
                 cur,
-                f"INSERT INTO {db_datatable} (geom, value, time) VALUES (ST_Multi(ST_Transform(ST_GeomFromText(%s, 3857), 4326)), %s, %s);",
+                'INSERT INTO radolan_data (id, geom, value, time, "createdAt", "updatedAt") VALUES (%s, ST_Multi(ST_Transform(ST_GeomFromText(%s, 3857), 4326)), %s, %s, %s, %s);',
                 values
             )
 
@@ -36,7 +37,7 @@ def export_data(values):
 def create_dataframe():
     filelist = create_filelist()
 
-    print("Starting to create Dataframe...")
+    print("Strating to upload data...")
     for file in tqdm(filelist, unit=".shp-file"):
         file_split = file.split("/")
         date_time_obj = datetime.strptime(
@@ -54,11 +55,15 @@ def create_dataframe():
                 values = []
                 number_of_rows = len(notNullValues.index)
                 for _, row in tqdm(notNullValues.iterrows(), leave=False, total=number_of_rows, unit=" rows"):
+                    time = datetime.strptime(datetime.strftime(
+                        datetime.now(), "%Y-%m-%d %H:%M:%S"), "%Y-%m-%d %H:%M:%S")
                     values.append(
-                        [dumps(row.geometry, rounding_precision=5), row.rain, date_time_obj])
+                        [(str(uuid.uuid4())), dumps(row.geometry, rounding_precision=5), row.rain, date_time_obj, time, time])
         export_data(values)
+    df = None
+    values = None
 
-    print("Dataframe created.")
+    print("Data uploaded.")
 
 
 if __name__ == "__main__":
