@@ -24,11 +24,11 @@ def export_data(values):
 
     with psycopg2.connect(config) as conn:
         with conn.cursor() as cur:
-            cur.execute(f"CREATE TABLE IF NOT EXISTS {db_datatable};")
+            cur.execute(f"CREATE TABLE IF NOT EXISTS radolan_data;")
             cur.execute(f"DELETE FROM {db_datatable};")
             psycopg2.extras.execute_batch(
                 cur,
-                f"INSERT INTO {db_datatable} (geometry, value, measured_at) VALUES (ST_Multi(ST_Transform(ST_GeomFromText(%s, 3857), 4326)), %s, %s);",
+                f"INSERT INTO {db_datatable} (geom, value, time) VALUES (ST_Multi(ST_Transform(ST_GeomFromText(%s, 3857), 4326)), %s, %s);",
                 values
             )
 
