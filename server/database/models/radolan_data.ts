@@ -12,14 +12,18 @@ module.exports = (sequelize, DataTypes) => {
     value: {
       type: DataTypes.INTEGER,
       defaultValue: null
+    },
+    geom: {
+      type: DataTypes.GEOMETRY,
+      allowNull: false,
     }
   })
 
-  RadolanData.associate = (models) => {
-    RadolanData.belongsTo(models.gridgeom, {
-      foreignKey: "grid_id"
-    })
-  }
+  // RadolanData.associate = (models) => {
+  //   RadolanData.belongsTo(models.gridgeom, {
+  //     foreignKey: "grid_id"
+  //   })
+  // }
   
   return RadolanData
 }

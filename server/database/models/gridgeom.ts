@@ -11,11 +11,11 @@ module.exports = (sequelize, DataTypes) => {
     }
   })
 
-  GridGeom.associate = (models) => {
-    GridGeom.hasMany(models.radolan_data, {
-      foreignKey: "grid_id"
-    })
-  }
+  // GridGeom.associate = (models) => {
+  //   GridGeom.hasMany(models.radolan_data, {
+  //     foreignKey: "grid_id"
+  //   })
+  // }
 
   return GridGeom
 }
