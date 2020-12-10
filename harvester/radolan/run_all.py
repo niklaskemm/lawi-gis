@@ -13,8 +13,8 @@ def run_all():
     unpack_data()
     crop_data()
     vectorize_data()
-    create_dataframe()
-    cleanup()
+    # create_dataframe()
+    # cleanup()
     print("Done!")
 
 
