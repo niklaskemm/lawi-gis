@@ -6,7 +6,6 @@ import geopandas as gpd
 from tqdm import tqdm
 from setup import setup_env
 from shapely.wkt import dumps
-from datetime import datetime
 
 
 def create_values():
@@ -19,16 +18,14 @@ def create_values():
     radolan_grid = gpd.read_file(radolan_grid_path).to_crs("epsg:4326")
     print("Dataframe created.")
 
-    print("Creating values array...")
+    print("Creating values list...")
     for _, row in tqdm(radolan_grid.iterrows(), leave=False, total=len(radolan_grid), unit=" rows"):
-        time = datetime.strptime(datetime.strftime(
-            datetime.now(), "%Y-%m-%d %H:%M:%S"), "%Y-%m-%d %H:%M:%S")
         geom = dumps(row.geometry, rounding_precision=5)
         values.append([
-            geom, geom, time, time
+            geom, geom
         ])
 
-    print("Values array created and exported.")
+    print("Values list created.")
 
     return values
 
@@ -49,7 +46,7 @@ def upload_data(values):
         with conn.cursor() as cur:
             psycopg2.extras.execute_batch(
                 cur,
-                'INSERT INTO gridgeoms (geom, centroid, "createdAt", "updatedAt") VALUES (ST_GeomFromText(%s, 4326), ST_Centroid(ST_GeomFromText(%s, 4326)), %s, %s);',
+                'INSERT INTO gridgeoms (geom, centroid, "createdAt", "updatedAt") VALUES (ST_GeomFromText(%s, 4326), ST_Centroid(ST_GeomFromText(%s, 4326)), CURRENT_TIMESTAMP(0), CURRENT_TIMESTAMP(0));',
                 values
             )
     print("Data uploaded.")
