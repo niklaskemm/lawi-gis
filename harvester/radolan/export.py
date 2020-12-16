@@ -1,5 +1,4 @@
 import os
-import uuid
 import psycopg2
 import geopandas
 import psycopg2.extras
@@ -19,25 +18,37 @@ def export_data(values):
     db_username = os.getenv("DB_USERNAME")
     db_password = os.getenv("DB_PASSWORD")
     db_database = os.getenv("DB_DATABASE")
-    # db_datatable = os.getenv("DB_DATATABLE")
 
     config = f"host='{db_server}' port={db_port} user='{db_username}' password='{db_password}' dbname='{db_database}'"
 
     with psycopg2.connect(config) as conn:
         with conn.cursor() as cur:
-            # cur.execute("CREATE TABLE IF NOT EXISTS radolan_data")
-            # cur.execute("DELETE FROM radolan_data")
+            print("Starting to upload temp data...")
+            cur.execute('DELETE FROM radolan_temps;')
             psycopg2.extras.execute_batch(
                 cur,
-                'INSERT INTO radolan_data (id, geom, value, time, "createdAt", "updatedAt") VALUES (%s, ST_Multi(ST_Transform(ST_GeomFromText(%s, 3857), 4326)), %s, %s, %s, %s);',
+                'INSERT INTO radolan_temps (geom, value, time, "createdAt", "updatedAt") VALUES (ST_Multi(ST_Transform(ST_GeomFromText(%s, 3857), 4326)), %s, %s, CURRENT_TIMESTAMP(0), CURRENT_TIMESTAMP(0));',
                 values
             )
+
+        with conn.cursor() as cur:
+            print("Starting to transfer temp data...")
+            cur.execute('INSERT INTO radolan_data ("createdAt", "updatedAt", grid_id, value, time) SELECT CURRENT_TIMESTAMP(0), CURRENT_TIMESTAMP(0), gridgeoms.id, radolan_temps.value, radolan_temps.time FROM gridgeoms JOIN radolan_temps ON ST_WithIn(gridgeoms.centroid, radolan_temps.geom);')
+            cur.execute('DELETE FROM radolan_temps;')
+
+        with conn.cursor() as cur:
+            print("Deleting duplicates...")
+            cur.execute(
+                "DELETE FROM radolan_data AS a USING radolan_data AS b WHERE a.id < b.id AND a.grid_id = b.grid_id AND a.time = b.time")
+
+    print("Data uploaded.")
 
 
 def create_dataframe():
     filelist = create_filelist()
+    values = []
 
-    print("Strating to upload data...")
+    print("Creating values list...")
     for file in tqdm(filelist, unit=".shp-file"):
         file_split = file.split("/")
         date_time_obj = datetime.strptime(
@@ -52,18 +63,17 @@ def create_dataframe():
         if df['geometry'].count() > 0:
             notNullValues = df[(df['rain'] > 0) & (df['rain'].notnull())]
             if len(notNullValues) > 0:
-                values = []
                 number_of_rows = len(notNullValues.index)
                 for _, row in tqdm(notNullValues.iterrows(), leave=False, total=number_of_rows, unit=" rows"):
-                    time = datetime.strptime(datetime.strftime(
-                        datetime.now(), "%Y-%m-%d %H:%M:%S"), "%Y-%m-%d %H:%M:%S")
                     values.append(
-                        [(str(uuid.uuid4())), dumps(row.geometry, rounding_precision=5), row.rain, date_time_obj, time, time])
-        export_data(values)
+                        [dumps(row.geometry, rounding_precision=5), row.rain, date_time_obj])
+
+    print("Values list created.")
+
+    export_data(values)
+
     df = None
     values = None
-
-    print("Data uploaded.")
 
 
 if __name__ == "__main__":
