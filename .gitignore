@@ -26,4 +26,4 @@ pnpm-debug.log*
 *.pyc
 
 # large files
-radolan_polygons.*
+radolan_grid
