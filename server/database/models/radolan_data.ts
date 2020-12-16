@@ -1,10 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
   var RadolanData = sequelize.define('radolan_data', {
-    id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-      primaryKey: true
-    },
     time: {
       type: DataTypes.DATE,
       allowNull: false,
@@ -12,10 +7,6 @@ module.exports = (sequelize, DataTypes) => {
     value: {
       type: DataTypes.INTEGER,
       defaultValue: null
-    },
-    geom: {
-      type: DataTypes.GEOMETRY,
-      allowNull: false,
     }
   })
 
