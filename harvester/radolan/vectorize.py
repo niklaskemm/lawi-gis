@@ -11,7 +11,7 @@ def vectorize_data():
     filelist = create_filelist()
 
     print("Starting vectorization...")
-    for file in tqdm(filelist, unit=" files"):
+    for file in tqdm(filelist, unit=" file"):
         file_split = file.split("/")
         date_time_obj = datetime.strptime(
             file_split[len(file_split)-1], 'RW_%Y%m%d-%H%M.asc')
