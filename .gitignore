@@ -24,3 +24,6 @@ pnpm-debug.log*
 
 # chached/compiled files
 *.pyc
+
+# large files
+radolan_polygons.*
