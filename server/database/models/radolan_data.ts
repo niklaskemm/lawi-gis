@@ -19,11 +19,11 @@ module.exports = (sequelize, DataTypes) => {
     }
   })
 
-  // RadolanData.associate = (models) => {
-  //   RadolanData.belongsTo(models.gridgeom, {
-  //     foreignKey: "grid_id"
-  //   })
-  // }
+  RadolanData.associate = (models) => {
+    RadolanData.belongsTo(models.gridgeom, {
+      foreignKey: "grid_id"
+    })
+  }
   
   return RadolanData
 }
