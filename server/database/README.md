@@ -31,4 +31,6 @@ sudo -u postgres psql
 
 ## To run seeder:
 
+```
 sequelize db:seed:all
+```
