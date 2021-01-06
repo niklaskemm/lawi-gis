@@ -1,17 +1,17 @@
 [x] update to WSL2
 [ ] set up database
     [x] create and lauch AWS RDS
-    [ ] set up basic tables 
-        [ ] user
-        [ ] field
+    [x] set up basic tables 
+        [x] user
+        [x] field
 [ ] develop basic API to interact with DB
     [ ] basic form for user
         [ ] configure Auth0 for login
     [ ] implement OL draw functionality
-[ ] implement RADOLAN data upload to DB 
-    [ ] set up corresponding tables
-        [ ] gridgeom
-        [ ] radolan_data
+[x] implement RADOLAN data upload to DB 
+    [x] set up corresponding tables
+        [x] gridgeom
+        [x] radolan_data
 [ ] set up SQL to intersect data
 
 .
