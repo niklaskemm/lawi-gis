@@ -3,10 +3,16 @@ import urllib.request
 
 from tqdm import tqdm
 from pathlib import Path
+from setup import setup
 from datetime import date, timedelta, datetime
 
 
 def download_data():
+
+    setup()
+
+    temp_path = os.getenv("TEMP_PATH")
+
     startdate = date.fromisoformat(str(os.getenv("STARTDATE")))
     date_counter = startdate
     days = int(os.getenv("LAST_N_DAYS"))
@@ -18,7 +24,7 @@ def download_data():
             date_counter.strftime("%Y%m%d"))
         url_split = url.split("/")
         dest_name = url_split[len(url_split) - 1]
-        dest = './temp/packed/' + dest_name
+        dest = temp_path + '/packed/' + dest_name
         urllib.request.urlretrieve(url, dest)
         date_counter += timedelta(days=1)
         counter += 1

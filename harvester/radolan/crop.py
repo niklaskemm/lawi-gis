@@ -1,51 +1,80 @@
+import os
 import gdal
 import urllib
 import geopandas
 
-from os import walk
 from tqdm import tqdm
+from setup import setup_env
 from datetime import datetime
 from shapely.ops import unary_union
 
 
 def get_buffer_shp():
-    germany = geopandas.read_file("zip://./../germany.zip")
-    germany = germany.to_crs("epsg:3857")
-    germany_boundary = geopandas.GeoDataFrame(
-        geopandas.GeoSeries(unary_union(germany['geometry'])))
-    germany_boundary = germany_boundary.rename(
+
+    setup_env()
+
+    boundaries_path = os.getenv("BOUNDARIES_PATH")
+    boundaries_shp_file = os.getenv("BOUNDARIES_SHP_FILE")
+    bounds = os.getenv("BOUNDS")
+    temp_path = os.getenv("TEMP_PATH")
+
+    boundaries = geopandas.read_file(
+        boundaries_path + "/" + bounds + "/" + bounds
+    )
+
+    boundaries = boundaries.to_crs("epsg:3857")
+    boundaries = geopandas.GeoDataFrame(
+        geopandas.GeoSeries(
+            unary_union(
+                boundaries['geometry']
+            )
+        )
+    )
+    boundaries = boundaries.rename(
         columns={0: 'geometry'}).set_geometry('geometry')
 
-    germany_buffer = germany_boundary.buffer(2000)
-    germany_buffer = germany_buffer.simplify(1000)
+    boundaries = boundaries.buffer(2000)
+    boundaries = boundaries.simplify(1000)
 
     # store for later use
-    germany_buffer = geopandas.GeoDataFrame(germany_buffer)
-    germany_buffer = germany_buffer.rename(
+    boundaries = geopandas.GeoDataFrame(boundaries)
+    boundaries = boundaries.rename(
         columns={0: 'geometry'}).set_geometry('geometry')
-    germany_buffer.crs = "epsg:3857"
-    germany_buffer.to_file("./temp/germany.shp")
+    boundaries.crs = "epsg:3857"
+    boundaries.to_file(temp_path + "/" + bounds + ".shp")
 
 
 def create_filelist():
+
+    setup_env()
+
+    temp_path = os.getenv("TEMP_PATH")
+
     filelist = []
 
-    path = "./temp/unpacked"
-    for (_, dirnames, _) in walk(path):
+    path = temp_path + "/unpacked"
+    for (_, dirnames, _) in os.walk(path):
         for dirname in dirnames:
             dpath = path + "/" + dirname
-            for (_, _, ffilenames) in walk(dpath):
+            for (_, _, ffilenames) in os.walk(dpath):
                 for ffilename in ffilenames:
                     filelist.append(dpath + "/" + ffilename)
     return filelist
 
 
 def crop_data():
+
+    setup_env()
+
+    temp_path = os.getenv("TEMP_PATH")
+    boundaries_path = os.getenv("BOUNDARIES_PATH")
+    bounds = os.getenv("BOUNDS")
+
     print("Starting cropping...")
     filelist = create_filelist()
     options = gdal.WarpOptions(resampleAlg=gdal.GRA_NearestNeighbour,
                                format="GTiff",
-                               cutlineDSName='./../boundary_germany/germany.shp',
+                               cutlineDSName=boundaries_path + "/" + bounds + "/" + bounds + ".shp",
                                dstSRS="+proj=stere +lon_0=10.0 +lat_0=90.0 +lat_ts=60.0 +a=6370040 +b=6370040 +units=m",
                                srcSRS="+proj=stere +lon_0=10.0 +lat_0=90.0 +lat_ts=60.0 +a=6370040 +b=6370040 +units=m",
                                cropToCutline=True)
@@ -55,7 +84,7 @@ def crop_data():
         date_time_obj = datetime.strptime(
             file_split[len(file_split)-1], 'RW_%Y%m%d-%H%M.asc')
         _ = gdal.Warp(
-            "./temp/cropped/{}.tif".format(date_time_obj.strftime("%Y%m%d-%H%M")), file, options=options)
+            temp_path + "/cropped/{}.tif".format(date_time_obj.strftime("%Y%m%d-%H%M")), file, options=options)
         _ = None
 
     print("Cropping complete.")

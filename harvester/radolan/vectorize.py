@@ -1,13 +1,19 @@
 import os
 import gdal
 
+from tqdm import tqdm
+from setup import setup_env
 from gdal import ogr, osr
 from datetime import datetime
 from crop import create_filelist
-from tqdm import tqdm
 
 
 def vectorize_data():
+
+    setup_env()
+
+    temp_path = os.getenv("TEMP_PATH")
+
     filelist = create_filelist()
 
     print("Starting vectorization...")
@@ -16,9 +22,9 @@ def vectorize_data():
         date_time_obj = datetime.strptime(
             file_split[len(file_split)-1], 'RW_%Y%m%d-%H%M.asc')
 
-        filename_input = "./temp/cropped/{}".format(
+        filename_input = temp_path + "/cropped/{}".format(
             date_time_obj.strftime("%Y%m%d-%H%M"))
-        filename_output = "./temp/vectorized/{}".format(
+        filename_output = temp_path + "/vectorized/{}".format(
             date_time_obj.strftime("%Y%m%d-%H%M"))
 
         source = gdal.Open(filename_input + ".tif")

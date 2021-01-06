@@ -11,7 +11,9 @@ from shapely.wkt import dumps
 def create_values():
     setup_env()
 
-    radolan_grid_path = os.getenv("RADOLAN_GRID_PATH")
+    radolan_path = os.getenv("RADOLAN_PATH")
+
+    radolan_grid_path = radolan_path + '/radolan_grid'
     values = []
 
     print("Creating dataframe...")
@@ -41,15 +43,26 @@ def upload_data(values):
 
     config = f"host='{db_server}' port={db_port} user='{db_username}' password='{db_password}' dbname='{db_database}'"
 
+    try:
+        conn = psycopg2.connect(config)
+        print("Connection to database established.")
+    except:
+        print("Could not establish database connection!")
+
     print("Uploading data...")
-    with psycopg2.connect(config) as conn:
-        with conn.cursor() as cur:
-            psycopg2.extras.execute_batch(
-                cur,
-                'INSERT INTO gridgeoms (geom, centroid, "createdAt", "updatedAt") VALUES (ST_GeomFromText(%s, 4326), ST_Centroid(ST_GeomFromText(%s, 4326)), CURRENT_TIMESTAMP(0), CURRENT_TIMESTAMP(0));',
-                values
-            )
+
+    with conn.cursor() as cur:
+        psycopg2.extras.execute_batch(
+            cur,
+            'INSERT INTO gridgeoms (geom, centroid, "createdAt", "updatedAt") VALUES (ST_GeomFromText(%s, 4326), ST_Centroid(ST_GeomFromText(%s, 4326)), CURRENT_TIMESTAMP(0), CURRENT_TIMESTAMP(0));',
+            values
+        )
+        conn.commit()
+
     print("Data uploaded.")
+
+    conn.close()
+    print("Connection closed.")
 
 
 if __name__ == "__main__":

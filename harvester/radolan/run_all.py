@@ -8,13 +8,12 @@ from vectorize import vectorize_data
 
 
 def run_all():
-    setup()
     download_data()
     unpack_data()
     crop_data()
     vectorize_data()
     create_dataframe()
-    # cleanup()
+    cleanup()
     print("Done!")
 
 

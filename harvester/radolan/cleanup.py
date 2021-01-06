@@ -1,8 +1,16 @@
+import os
 import shutil
+
+from setup import setup_env
 
 
 def cleanup():
-    shutil.rmtree('./temp', ignore_errors=True)
+
+    setup_env()
+
+    temp_path = os.getenv("TEMP_PATH")
+
+    shutil.rmtree(temp_path, ignore_errors=True)
     print("Cleanup complete.")
 
 

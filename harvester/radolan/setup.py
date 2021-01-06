@@ -11,20 +11,24 @@ def setup_env():
 
 
 def setup_folders():
-    if not exists('temp'):
-        makedirs('temp')
 
-    if not exists('temp/packed'):
-        makedirs('temp/packed')
+    setup_env()
+    temp_path = getenv("TEMP_PATH")
 
-    if not exists('temp/unpacked'):
-        makedirs('temp/unpacked')
+    if not exists(temp_path):
+        makedirs(temp_path)
 
-    if not exists('temp/cropped'):
-        makedirs('temp/cropped')
+    if not exists(temp_path + '/packed'):
+        makedirs(temp_path + '/packed')
 
-    if not exists('temp/vectorized'):
-        makedirs('temp/vectorized')
+    if not exists(temp_path + '/unpacked'):
+        makedirs(temp_path + '/unpacked')
+
+    if not exists(temp_path + '/cropped'):
+        makedirs(temp_path + '/cropped')
+
+    if not exists(temp_path + '/vectorized'):
+        makedirs(temp_path + '/vectorized')
 
 
 def setup_dates():
@@ -38,7 +42,6 @@ def setup_dates():
 def setup():
     setup_folders()
     setup_dates()
-    print("Setup complete.")
 
 
 if __name__ == "__main__":
