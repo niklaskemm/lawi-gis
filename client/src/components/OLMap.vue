@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <h1>{{ coordClicked }}</h1>
+    <h1>{{ gridId }}</h1>
     <h2 v-if="geolocationError">{{ geolocationError }}</h2>
     <div id="map" class="map"></div>
   </div>
@@ -33,6 +34,7 @@ export default defineComponent({
   setup() {
     // GENERAL VARIABLES
     const coordClicked: Ref<Array<number>> = ref([]);
+    const gridId: Ref<number> = ref(0);
     let geolocationError = undefined;
     const accuracyFeature = new Feature();
     const positionFeature = new Feature();
@@ -59,9 +61,9 @@ export default defineComponent({
       projection: view.getProjection()
     });
 
-    geolocation.on("change:accuracyGeometry", function() {
-      accuracyFeature.setGeometry(geolocation.getAccuracyGeometry());
-    });
+    // geolocation.on("change:accuracyGeometry", function() {
+    //   accuracyFeature.setGeometry(geolocation.getAccuracyGeometry());
+    // });
 
     positionFeature.setStyle(
       new Style({
@@ -78,23 +80,24 @@ export default defineComponent({
       })
     );
 
-    let userCoordinates: Coordinate;
-    geolocation.on("change:position", function() {
-      const coordinates: Coordinate = geolocation.getPosition();
-      positionFeature.setGeometry(new Point(coordinates));
-      userCoordinates = coordinates;
-    });
+    // let userCoordinates: Coordinate;
+    // geolocation.on("change:position", function() {
+    //   const coordinates: Coordinate = geolocation.getPosition();
+    //   positionFeature.setGeometry(new Point(coordinates));
+    //   userCoordinates = coordinates;
+    // });
 
-    const layerGeolocation = new VectorLayer({
-      source: new VectorSource({
-        features: [accuracyFeature, positionFeature]
-      })
-    });
+    // const layerGeolocation = new VectorLayer({
+    //   source: new VectorSource({
+    //     features: [accuracyFeature, positionFeature]
+    //   })
+    // });
 
     // MAPOPTIONS SETUP
     const mapOptions: MapOptions = {
       target: "map",
-      layers: [layerOSM, layerGeolocation],
+      layers: [layerOSM],
+      // layers: [layerOSM, layerGeolocation],
       view: view,
       controls: defaultControls({ attribution: false }).extend([attribution])
     };
@@ -123,10 +126,11 @@ export default defineComponent({
             transform(pixel.coordinate, "EPSG:3857", targetProjection)[1] *
               coordPrecision
           ) / coordPrecision;
+        gridId.value = gridId.value + 1;
       });
     });
 
-    return { coordClicked, geolocationError };
+    return { coordClicked, geolocationError, gridId };
   }
 });
 </script>
