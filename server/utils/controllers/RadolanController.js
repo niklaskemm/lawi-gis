@@ -56,15 +56,15 @@ module.exports = {
   },
 
   async getDataByGeom(req, res) {
-    const { filter } = req.body
-    const { geom } = req.body
-
     try {
-      const data = await db.sequelize.query(
+      const { filter } = req.body
+      const { geom } = req.body
+      const [data, metadata] = await db.sequelize.query(
         `SELECT ${filter} FROM radolan_data rd JOIN gridgeoms g ON rd.grid_id = g.id WHERE ST_INTERSECTS(g.geom, ST_GEOMFROMTEXT('${geom}', 4326));`
       )
+      // metadata contains .rows with the same info as in data
       if (data) {
-        res.send(data)
+        res.send(metadata)
         // console.log(metadata.rowCount)
       } else {
         res.status(404).send("No data found.")

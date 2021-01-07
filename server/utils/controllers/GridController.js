@@ -34,11 +34,12 @@ module.exports = {
     const { filter } = req.body
     const { geom } = req.body
     try {
-      const data = await db.sequelize.query(
+      const [data, metadata] = await db.sequelize.query(
         `SELECT ${filter} FROM gridgeoms g WHERE ST_INTERSECTS(g.geom, ST_GEOMFROMTEXT('${geom}', 4326))`
       )
+      // metadata contains .rows with the same info as in data
       if (data) {
-        res.send(data)
+        res.send(metadata)
         // console.log(metadata.rowCount)
       } else {
         res.status(404).send("No data found.")
