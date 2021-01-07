@@ -6,11 +6,11 @@ module.exports = (app) => {
   app.get("/api/radolan", RadolanController.index)
   app.get("/api/radolan/byid/:id", RadolanController.getDataById)
   app.get("/api/radolan/bygridid/:grid_id", RadolanController.getDataByGridId)
-  app.get("/api/radolan/bygeom", RadolanController.getDataByGeom)
+  app.post("/api/radolan/bygeom", RadolanController.getDataByGeom)
 
   app.get("/api/grid", GridController.index)
   app.get("/api/grid/byid/:id", GridController.getGridById)
-  app.get("/api/grid/bygeom", GridController.getGridByGeom)
+  app.post("/api/grid/bygeom", GridController.getGridByGeom)
 
   app.get("/api/users", UserController.index)
 }

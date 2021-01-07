@@ -46,7 +46,9 @@ module.exports = {
       }
     } catch (err) {
       if ((err.name = "SequelizeDatabaseError")) {
-        res.status(400).send(`Invalid input syntax for type integer: "${id}"`)
+        res
+          .status(400)
+          .send(`Invalid input syntax for type integer: "${grid_id}"`)
       } else {
         res.status(503).send({ error: err })
       }
@@ -58,8 +60,8 @@ module.exports = {
     const { geom } = req.body
 
     try {
-      const [data, metadata] = await db.sequelize.query(
-        `SELECT ${filter} FROM radolan_data rd JOIN gridgeoms g ON rd.grid_id = g.id WHERE ST_CONTAINS(g.geom, ST_GEOMFROMTEXT('${geom}', 4326));`
+      const data = await db.sequelize.query(
+        `SELECT ${filter} FROM radolan_data rd JOIN gridgeoms g ON rd.grid_id = g.id WHERE ST_INTERSECTS(g.geom, ST_GEOMFROMTEXT('${geom}', 4326));`
       )
       if (data) {
         res.send(data)
