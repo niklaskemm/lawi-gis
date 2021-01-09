@@ -1,8 +1,8 @@
 <template>
   <div id="app">
     <h1>{{ coordClicked }}</h1>
-    <h1>{{ gridId }}</h1>
-    <h2 v-if="geolocationError">{{ geolocationError }}</h2>
+    <!-- <h1>{{ gridId }}</h1> -->
+    <!-- <h2 v-if="geolocationError">{{ geolocationError }}</h2> -->
     <div id="map" class="map"></div>
   </div>
 </template>
@@ -14,7 +14,7 @@ import "ol/ol.css";
 
 import Feature from "ol/Feature";
 import Point from "ol/geom/Point";
-import Geolocation from "ol/Geolocation";
+import Geolocation, { GeolocationError } from "ol/Geolocation";
 import { Map, View } from "ol";
 import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer";
 import { OSM, Vector as VectorSource } from "ol/source";
@@ -28,6 +28,8 @@ import { targetProjection } from "../utils/variables";
 import { MapOptions } from "ol/PluggableMap";
 import { Coordinate } from "ol/coordinate";
 
+import GridService from "../utils/services/GridService"
+
 export default defineComponent({
   name: "OLMap",
 
@@ -35,9 +37,11 @@ export default defineComponent({
     // GENERAL VARIABLES
     const coordClicked: Ref<Array<number>> = ref([]);
     const gridId: Ref<number> = ref(0);
-    let geolocationError = undefined;
+    // let geolocationError:GeolocationError = ;
     const accuracyFeature = new Feature();
     const positionFeature = new Feature();
+
+    let response:any;
 
     // BASIC OPENLAYERS SETUP
     const attribution: Attribution = new Attribution({
@@ -54,12 +58,12 @@ export default defineComponent({
     });
 
     // GEOLOCATION SUPPORT
-    const geolocation = new Geolocation({
-      trackingOptions: {
-        enableHighAccuracy: true
-      },
-      projection: view.getProjection()
-    });
+    // const geolocation = new Geolocation({
+    //   trackingOptions: {
+    //     enableHighAccuracy: true
+    //   },
+    //   projection: view.getProjection()
+    // });
 
     // geolocation.on("change:accuracyGeometry", function() {
     //   accuracyFeature.setGeometry(geolocation.getAccuracyGeometry());
@@ -105,17 +109,17 @@ export default defineComponent({
     // IMPLEMENTATION OF MAP & SUPPORT FUNCTIONS
     onMounted(async () => {
       // ask for location permission
-      geolocation.setTracking(true);
+      // geolocation.setTracking(true);
 
-      geolocation.on("error", function(error) {
-        geolocationError = error;
-      });
+      // geolocation.on("error", function(error) {
+      //   geolocationError = error;
+      // });
 
       // register mapOptions on new Map
       const map: Map = new Map(mapOptions);
 
       // define onClick behaviour of map
-      map.on("click", function(pixel) {
+      map.on("click", async function(pixel) {
         coordClicked.value[0] =
           Math.round(
             transform(pixel.coordinate, "EPSG:3857", targetProjection)[0] *
@@ -126,11 +130,18 @@ export default defineComponent({
             transform(pixel.coordinate, "EPSG:3857", targetProjection)[1] *
               coordPrecision
           ) / coordPrecision;
-        gridId.value = gridId.value + 1;
+
+        const gridFilter = ["g.id", "g.geom", "g.centroid"]
+        const gridWKT = `POINT (${coordClicked.value[0]} ${coordClicked.value[1]})` 
+   
+        response = await GridService.getGridById(gridFilter, gridWKT)
+        const gridGeom = response.data[0][0].geom.coordinates[0]
+        const gridId = response.data[0][0].id
+        console.log(gridGeom, gridId)
       });
     });
 
-    return { coordClicked, geolocationError, gridId };
+    return { coordClicked };
   }
 });
 </script>
