@@ -30,26 +30,26 @@ export default defineComponent({
   name: "OLMap",
 
   setup() {
-    // GENERAL VARIABLES
+    // ! GENERAL VARIABLES
     const coordClicked: Ref<Array<number>> = ref([]);
     const gridId: Ref<number> = ref(0);
-    // let geolocationError:GeolocationError = ;
-    const accuracyFeature = new Feature();
-    const positionFeature = new Feature();
+    let geolocationError:GeolocationError;
+    const accuracyFeature: Feature = new Feature();
+    const positionFeature: Feature = new Feature();
 
     let response:any;
 
-    // BASIC OPENLAYERS SETUP
+    // ! BASIC OPENLAYERS SETUP
     const attribution: Attribution = new Attribution({
       collapsible: true
     });
 
-    const view = new View({
+    const view: View = new View({
       center: fromLonLat([centerLon, centerLat]),
       zoom: zoom
     });
 
-    // STYLE SETUP
+    // ! STYLE SETUP
     positionFeature.setStyle(
       new Style({
         image: new CircleStyle({
@@ -75,20 +75,22 @@ export default defineComponent({
       }),
     })
 
-    // BASIC LAYER SETUP
+    // ! BASIC LAYER SETUP
     const layerOSM = new TileLayer({
       source: new OSM()
     });
 
     const layerGrid = new VectorLayer({
-          style: styleGrid,
-          updateWhileInteracting: true,
-          zIndex: 2,
-        });
-    
-    
+      style: styleGrid,
+      updateWhileInteracting: true,
+      zIndex: 2,
+    });
 
-    // GEOLOCATION SUPPORT
+    // TODO add draw layer
+
+    // const layerGeolocation = new VectorLayer({});
+    
+    // ! GEOLOCATION SUPPORT
     // const geolocation = new Geolocation({
     //   trackingOptions: {
     //     enableHighAccuracy: true
@@ -100,29 +102,27 @@ export default defineComponent({
     //   accuracyFeature.setGeometry(geolocation.getAccuracyGeometry());
     // });
 
-    // let userCoordinates: Coordinate;
     // geolocation.on("change:position", function() {
-    //   const coordinates: Coordinate = geolocation.getPosition();
-    //   positionFeature.setGeometry(new Point(coordinates));
-    //   userCoordinates = coordinates;
+    //   if ( geolocation.getPosition()) {
+    //     const coordinates: Coordinate = geolocation.getPosition();
+    //     positionFeature.setGeometry(new Point(coordinates));
+    //   }
     // });
 
-    // const layerGeolocation = new VectorLayer({
-    //   source: new VectorSource({
+    // layerGeolocation.setSource( new VectorSource({
     //     features: [accuracyFeature, positionFeature]
     //   })
-    // });
+    // )
 
-    // MAPOPTIONS SETUP
+    // ! MAPOPTIONS SETUP
     const mapOptions: MapOptions = {
       target: "map",
       layers: [layerOSM],
-      // layers: [layerOSM, layerGrid, layerGeolocation],
       view: view,
       controls: defaultControls({ attribution: false }).extend([attribution])
     };
 
-    // IMPLEMENTATION OF MAP & SUPPORT FUNCTIONS
+    // ! IMPLEMENTATION OF MAP & SUPPORT FUNCTIONS
     onMounted(async () => {
       // ask for location permission
       // geolocation.setTracking(true);
@@ -134,7 +134,7 @@ export default defineComponent({
       // register mapOptions on new Map
       const map: Map = new Map(mapOptions);
 
-      // define onClick behaviour of map
+      // ! define onClick behaviour of map
       map.on("click", async function(pixel) {
         // set the clicked coordinate values
         coordClicked.value[0] =
@@ -171,6 +171,7 @@ export default defineComponent({
             geometry: new GeoJSON().readGeometry(gridExtentGeoJSON, {featureProjection: "EPSG:3857"}),
             labelPoint: new GeoJSON().readGeometry(gridCentroidGeoJSON, {featureProjection: "EPSG:3857"}),
             name: gridId
+            // TODO show ID or arbitrary name at centroid
           })
           
           gridSource.addFeature(gridFeature)
@@ -179,6 +180,10 @@ export default defineComponent({
           layerGrid.setSource(gridSource)
 
           map.addLayer(layerGrid)
+
+          console.log(gridCentroidGeoJSON)
+
+          // TODO add zoom to grid
         }
       })
     });
