@@ -1,8 +1,5 @@
 <template>
   <div id="app">
-    <h1>{{ coordClicked }}</h1>
-    <!-- <h1>{{ gridId }}</h1> -->
-    <!-- <h2 v-if="geolocationError">{{ geolocationError }}</h2> -->
     <div id="map" class="map"></div>
   </div>
 </template>
@@ -10,25 +7,24 @@
 <script lang="ts">
 import { defineComponent, onMounted, ref, Ref } from "vue";
 
-import "ol/ol.css";
-
-import Feature from "ol/Feature";
-import Point from "ol/geom/Point";
-import Geolocation, { GeolocationError } from "ol/Geolocation";
-import { Map, View } from "ol";
+import GeoJSON from 'ol/format/GeoJSON';
+import { Point, Polygon } from "ol/geom";
+import { Coordinate } from "ol/coordinate";
+import { MapOptions } from "ol/PluggableMap";
+import { transform, fromLonLat } from "ol/proj";
+import { GeolocationError } from "ol/Geolocation";
+import { Map, View, Feature, Geolocation } from "ol";
+import { OSM, Source, Vector as VectorSource } from "ol/source";
 import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer";
-import { OSM, Vector as VectorSource } from "ol/source";
 import { Attribution, defaults as defaultControls } from "ol/control";
 import { Circle as CircleStyle, Fill, Stroke, Style } from "ol/style";
-import { transform, fromLonLat } from "ol/proj";
 
-import { centerLon, centerLat, zoom, coordPrecision } from "../utils/variables";
-import { targetProjection } from "../utils/variables";
+import "ol/ol.css";
 
-import { MapOptions } from "ol/PluggableMap";
-import { Coordinate } from "ol/coordinate";
+import { centerLon, centerLat, zoom, coordPrecision, targetProjection } from "../utils/variables";
 
 import GridService from "../utils/services/GridService"
+import LayerRenderer from "ol/renderer/Layer";
 
 export default defineComponent({
   name: "OLMap",
@@ -48,27 +44,12 @@ export default defineComponent({
       collapsible: true
     });
 
-    const layerOSM = new TileLayer({
-      source: new OSM()
-    });
-
     const view = new View({
       center: fromLonLat([centerLon, centerLat]),
       zoom: zoom
     });
 
-    // GEOLOCATION SUPPORT
-    // const geolocation = new Geolocation({
-    //   trackingOptions: {
-    //     enableHighAccuracy: true
-    //   },
-    //   projection: view.getProjection()
-    // });
-
-    // geolocation.on("change:accuracyGeometry", function() {
-    //   accuracyFeature.setGeometry(geolocation.getAccuracyGeometry());
-    // });
-
+    // STYLE SETUP
     positionFeature.setStyle(
       new Style({
         image: new CircleStyle({
@@ -83,6 +64,41 @@ export default defineComponent({
         })
       })
     );
+
+    const styleGrid = new Style({
+      stroke: new Stroke({
+        color: 'blue',
+        width: 3,
+      }),
+      fill: new Fill({
+        color: 'rgba(0, 0, 255, 0.1)',
+      }),
+    })
+
+    // BASIC LAYER SETUP
+    const layerOSM = new TileLayer({
+      source: new OSM()
+    });
+
+    const layerGrid = new VectorLayer({
+          style: styleGrid,
+          updateWhileInteracting: true,
+          zIndex: 2,
+        });
+    
+    
+
+    // GEOLOCATION SUPPORT
+    // const geolocation = new Geolocation({
+    //   trackingOptions: {
+    //     enableHighAccuracy: true
+    //   },
+    //   projection: view.getProjection()
+    // });
+
+    // geolocation.on("change:accuracyGeometry", function() {
+    //   accuracyFeature.setGeometry(geolocation.getAccuracyGeometry());
+    // });
 
     // let userCoordinates: Coordinate;
     // geolocation.on("change:position", function() {
@@ -101,7 +117,7 @@ export default defineComponent({
     const mapOptions: MapOptions = {
       target: "map",
       layers: [layerOSM],
-      // layers: [layerOSM, layerGeolocation],
+      // layers: [layerOSM, layerGrid, layerGeolocation],
       view: view,
       controls: defaultControls({ attribution: false }).extend([attribution])
     };
@@ -120,6 +136,7 @@ export default defineComponent({
 
       // define onClick behaviour of map
       map.on("click", async function(pixel) {
+        // set the clicked coordinate values
         coordClicked.value[0] =
           Math.round(
             transform(pixel.coordinate, "EPSG:3857", targetProjection)[0] *
@@ -131,17 +148,42 @@ export default defineComponent({
               coordPrecision
           ) / coordPrecision;
 
+        // register the filter used to get data from db
         const gridFilter = ["g.id", "g.geom", "g.centroid"]
+        // build WKT representation of clicked coordinate
         const gridWKT = `POINT (${coordClicked.value[0]} ${coordClicked.value[1]})` 
-   
+
+        // make POST request to backend server to retrieve filtered data
         response = await GridService.getGridById(gridFilter, gridWKT)
-        const gridGeom = response.data[0][0].geom.coordinates[0]
+
+        // get grid extent GeoJSON from response
+        const gridExtentGeoJSON = response.data[0][0].geom
+        // get grid centroid GeoJSON from response
+        const gridCentroidGeoJSON = response.data[0][0].centroid
+        // get gridId from response
         const gridId = response.data[0][0].id
-        console.log(gridGeom, gridId)
-      });
+        
+        try {
+          map.removeLayer(layerGrid)
+        } finally {
+          const gridSource = new VectorSource({})
+          const gridFeature = new Feature({
+            geometry: new GeoJSON().readGeometry(gridExtentGeoJSON, {featureProjection: "EPSG:3857"}),
+            labelPoint: new GeoJSON().readGeometry(gridCentroidGeoJSON, {featureProjection: "EPSG:3857"}),
+            name: gridId
+          })
+          
+          gridSource.addFeature(gridFeature)
+
+          layerGrid.unset("Source")
+          layerGrid.setSource(gridSource)
+
+          map.addLayer(layerGrid)
+        }
+      })
     });
 
-    return { coordClicked };
+    return {};
   }
 });
 </script>
