@@ -1,43 +1,47 @@
 <template>
-  <div id="app">
+  <div>
     <div id="map" class="map"></div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref, Ref } from "vue";
+import { defineComponent, onMounted } from "vue";
 
-import GeoJSON from 'ol/format/GeoJSON';
-import { Point, Polygon } from "ol/geom";
-import { Coordinate } from "ol/coordinate";
+// ! IMPORT OL CLASSES
+import GeoJSON from "ol/format/GeoJSON";
 import { MapOptions } from "ol/PluggableMap";
 import { transform, fromLonLat } from "ol/proj";
-import { GeolocationError } from "ol/Geolocation";
-import { Map, View, Feature, Geolocation } from "ol";
-import { OSM, Source, Vector as VectorSource } from "ol/source";
+import { Map, View, Overlay } from "ol";
+import { OSM, Vector as VectorSource } from "ol/source";
 import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer";
 import { Attribution, defaults as defaultControls } from "ol/control";
-import { Circle as CircleStyle, Fill, Stroke, Style } from "ol/style";
+import { Fill, Stroke, Style } from "ol/style";
+// import { Geolocation } from "ol";
+// import { GeolocationError } from "ol/Geolocation";
 
+// ! IMPORT OL STYLES
 import "ol/ol.css";
 
-import { centerLon, centerLat, zoom, coordPrecision, targetProjection } from "../utils/variables";
+// ! IMPORT VARIABLES
+import {
+  centerLon,
+  centerLat,
+  zoom,
+  coordPrecision,
+  targetProjection
+} from "../utils/variables";
 
-import GridService from "../utils/services/GridService"
-import LayerRenderer from "ol/renderer/Layer";
+// ! IMPORT SERVICES
+import GridService from "../utils/services/GridService";
 
 export default defineComponent({
   name: "OLMap",
+  components: {},
 
   setup() {
     // ! GENERAL VARIABLES
-    const coordClicked: Ref<Array<number>> = ref([]);
-    const gridId: Ref<number> = ref(0);
-    let geolocationError:GeolocationError;
-    const accuracyFeature: Feature = new Feature();
-    const positionFeature: Feature = new Feature();
-
-    let response:any;
+    // register the filter used to get data from db
+    const gridFilter = ["g.id", "g.geom", "g.centroid"];
 
     // ! BASIC OPENLAYERS SETUP
     const attribution: Attribution = new Attribution({
@@ -50,30 +54,15 @@ export default defineComponent({
     });
 
     // ! STYLE SETUP
-    positionFeature.setStyle(
-      new Style({
-        image: new CircleStyle({
-          radius: 6,
-          fill: new Fill({
-            color: "#3399CC"
-          }),
-          stroke: new Stroke({
-            color: "#fff",
-            width: 2
-          })
-        })
-      })
-    );
-
     const styleGrid = new Style({
       stroke: new Stroke({
-        color: 'blue',
-        width: 3,
+        color: "blue",
+        width: 3
       }),
       fill: new Fill({
-        color: 'rgba(0, 0, 255, 0.1)',
-      }),
-    })
+        color: "rgba(0, 0, 255, 0.1)"
+      })
+    });
 
     // ! BASIC LAYER SETUP
     const layerOSM = new TileLayer({
@@ -83,14 +72,37 @@ export default defineComponent({
     const layerGrid = new VectorLayer({
       style: styleGrid,
       updateWhileInteracting: true,
-      zIndex: 2,
+      zIndex: 2
     });
 
     // TODO add draw layer
 
-    // const layerGeolocation = new VectorLayer({});
-    
+    // ! BASIC OVERLAY SETUP
+    const overlayGrid = new Overlay({
+      element: undefined,
+      position: undefined
+    });
+
     // ! GEOLOCATION SUPPORT
+    // let geolocationError: GeolocationError;
+    // const accuracyFeature: Feature = new Feature();
+    // const positionFeature: Feature = new Feature();
+
+    // positionFeature.setStyle(
+    //   new Style({
+    //     image: new CircleStyle({
+    //       radius: 6,
+    //       fill: new Fill({
+    //         color: "#3399CC"
+    //       }),
+    //       stroke: new Stroke({
+    //         color: "#fff",
+    //         width: 2
+    //       })
+    //     })
+    //   })
+    // );
+
     // const geolocation = new Geolocation({
     //   trackingOptions: {
     //     enableHighAccuracy: true
@@ -114,15 +126,40 @@ export default defineComponent({
     //   })
     // )
 
+    // const layerGeolocation = new VectorLayer({});
+
     // ! MAPOPTIONS SETUP
     const mapOptions: MapOptions = {
       target: "map",
       layers: [layerOSM],
+      overlays: [],
       view: view,
       controls: defaultControls({ attribution: false }).extend([attribution])
     };
 
-    // ! IMPLEMENTATION OF MAP & SUPPORT FUNCTIONS
+    // ! HELPER FUNCTIONS
+    async function getGridDataAtLocation(LonLat) {
+      // build WKT representation of clicked coordinate
+      const gridWKT = `POINT (${LonLat[0]} ${LonLat[1]})`;
+      // make POST request to backend server to retrieve filtered data
+      const response = await GridService.getGridById(gridFilter, gridWKT);
+
+      const Data = {
+        gridId: response.data[0][0].id,
+        gridExtentGeoJSON: response.data[0][0].geom,
+        gridCentroidGeoJSON: response.data[0][0].centroid,
+        gridCentroidLonLat: [0, 0]
+      };
+
+      Data.gridCentroidLonLat = [
+        Data.gridCentroidGeoJSON.coordinates[0],
+        Data.gridCentroidGeoJSON.coordinates[1]
+      ];
+
+      return { Data };
+    }
+
+    // ! IMPLEMENTATION OF MAP
     onMounted(async () => {
       // ask for location permission
       // geolocation.setTracking(true);
@@ -135,57 +172,57 @@ export default defineComponent({
       const map: Map = new Map(mapOptions);
 
       // ! define onClick behaviour of map
-      map.on("click", async function(pixel) {
+      map.on("singleclick", async function(pixel) {
         // set the clicked coordinate values
-        coordClicked.value[0] =
+        const coordClicked: Array<number> = [];
+        coordClicked[0] =
           Math.round(
             transform(pixel.coordinate, "EPSG:3857", targetProjection)[0] *
               coordPrecision
           ) / coordPrecision;
-        coordClicked.value[1] =
+        coordClicked[1] =
           Math.round(
             transform(pixel.coordinate, "EPSG:3857", targetProjection)[1] *
               coordPrecision
           ) / coordPrecision;
 
-        // register the filter used to get data from db
-        const gridFilter = ["g.id", "g.geom", "g.centroid"]
-        // build WKT representation of clicked coordinate
-        const gridWKT = `POINT (${coordClicked.value[0]} ${coordClicked.value[1]})` 
+        const APIResultGrid = await getGridDataAtLocation(coordClicked);
 
-        // make POST request to backend server to retrieve filtered data
-        response = await GridService.getGridById(gridFilter, gridWKT)
-
-        // get grid extent GeoJSON from response
-        const gridExtentGeoJSON = response.data[0][0].geom
-        // get grid centroid GeoJSON from response
-        const gridCentroidGeoJSON = response.data[0][0].centroid
-        // get gridId from response
-        const gridId = response.data[0][0].id
-        
         try {
-          map.removeLayer(layerGrid)
+          map.removeLayer(layerGrid);
         } finally {
-          const gridSource = new VectorSource({})
-          const gridFeature = new Feature({
-            geometry: new GeoJSON().readGeometry(gridExtentGeoJSON, {featureProjection: "EPSG:3857"}),
-            labelPoint: new GeoJSON().readGeometry(gridCentroidGeoJSON, {featureProjection: "EPSG:3857"}),
-            name: gridId
-            // TODO show ID or arbitrary name at centroid
-          })
-          
-          gridSource.addFeature(gridFeature)
+          const gridFeature = new GeoJSON().readFeature(
+            APIResultGrid.Data.gridExtentGeoJSON,
+            {
+              featureProjection: "EPSG:3857"
+            }
+          );
+          // TODO add popup with gridId
+          const gridSource = new VectorSource({});
+          gridSource.addFeature(gridFeature);
 
-          layerGrid.unset("Source")
-          layerGrid.setSource(gridSource)
+          layerGrid.unset("Source");
+          layerGrid.setSource(gridSource);
 
-          map.addLayer(layerGrid)
+          // OverlayGrid.props.gridId = gridId;
+          overlayGrid.setPosition(
+            fromLonLat(APIResultGrid.Data.gridCentroidLonLat)
+          );
+          // overlayGrid.setPositioning('center-center');
+          // overlayGrid.setElement(OverlayGridRef.$el)
 
-          console.log(gridCentroidGeoJSON)
+          console.log(APIResultGrid.Data.gridId);
 
-          // TODO add zoom to grid
+          map.addLayer(layerGrid);
+          map.addOverlay(overlayGrid);
+
+          view.animate({
+            center: fromLonLat(APIResultGrid.Data.gridCentroidLonLat),
+            zoom: 13.65,
+            duration: 500
+          });
         }
-      })
+      });
     });
 
     return {};

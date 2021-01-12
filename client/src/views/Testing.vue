@@ -1,27 +1,44 @@
 <template>
   <div>
-    <h1>TESTING</h1>
-    <div class="map-container"><OLMap /></div>
+    <Map
+      :baseLayers="baseLayers"
+      :centerLon="centerLon"
+      :centerLat="centerLat"
+      :zoom="zoom"
+    />
   </div>
+  <!-- <div>
+    <OLMap />
+  </div> -->
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import OLMap from "@/components/OLMap.vue";
+import Map from "../components/Map.vue";
+// import OLMap from "../components/OLMap.vue";
+
+import { layerOSM } from "../utils/baselayers";
 
 export default defineComponent({
   name: "Testing",
   components: {
-    OLMap
+    // OLMap,
+    Map
+  },
+
+  setup() {
+    const baseLayers = [
+      layerOSM
+      // layerStamenToner
+    ];
+
+    const centerLon = 10;
+    const centerLat = 54.4;
+    const zoom = 8;
+
+    return { baseLayers, centerLon, centerLat, zoom };
   }
 });
 </script>
 
-<style lang="scss" scoped>
-.map-container {
-  position: absolute;
-  left: 0;
-  width: 100vw;
-  height: 75vh;
-}
-</style>
+<style lang="scss" scoped></style>
