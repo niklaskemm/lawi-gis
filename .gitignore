@@ -6,7 +6,6 @@ temp
 # local config, env and TODO files
 config.*
 .env
-TODO.*
 
 # Log files
 npm-debug.log*
