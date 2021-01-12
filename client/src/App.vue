@@ -1,20 +1,20 @@
 <template>
   <div id="app">
     <router-view />
-    <navbar />
+    <!-- <navbar /> -->
   </div>
 </template>
 
 <script lang="ts">
-import Navbar from "@/components/Navbar.vue"
-import { defineComponent } from "vue"
+// import Navbar from "@/components/Navbar.vue";
+import { defineComponent } from "vue";
 
 export default defineComponent({
   name: "app",
   components: {
-    Navbar
+    // Navbar
   }
-})
+});
 </script>
 
 <style lang="scss">
