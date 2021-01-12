@@ -3,9 +3,10 @@ node_modules
 /dist
 temp
 
-# local config and env files
+# local config, env and TODO files
 config.*
 .env
+TODO.*
 
 # Log files
 npm-debug.log*
