@@ -41,6 +41,10 @@ export default defineComponent({
     zoom: {
       type: Number,
       default: 10
+    },
+    clickable: {
+      type: Boolean,
+      default: true
     }
   },
 
@@ -83,48 +87,50 @@ export default defineComponent({
 
       overlay.setElement(popupContainer.value!);
 
-      map.on("singleclick", async function(event) {
-        const coordinate = event.coordinate;
+      if (props.clickable) {
+        map.on("singleclick", async function(event) {
+          const coordinate = event.coordinate;
 
-        const APIResultGrid = await getGridDataAtLocation(
-          transform(coordinate, "EPSG:3857", targetProjection)
-        );
-
-        gridId.value = APIResultGrid.Data.gridId;
-
-        try {
-          map.removeLayer(layerGrid);
-        } finally {
-          const gridSource = new VectorSource({});
-
-          const gridFeature = new GeoJSON().readFeature(
-            APIResultGrid.Data.gridExtentGeoJSON,
-            {
-              featureProjection: "EPSG:3857"
-            }
+          const APIResultGrid = await getGridDataAtLocation(
+            transform(coordinate, "EPSG:3857", targetProjection)
           );
 
-          gridSource.addFeature(gridFeature);
+          gridId.value = APIResultGrid.Data.gridId;
 
-          layerGrid.unset("Source");
-          layerGrid.setSource(gridSource);
+          try {
+            map.removeLayer(layerGrid);
+          } finally {
+            const gridSource = new VectorSource({});
 
-          overlay.setPosition(
-            fromLonLat(APIResultGrid.Data.gridCentroidLonLat)
-          );
+            const gridFeature = new GeoJSON().readFeature(
+              APIResultGrid.Data.gridExtentGeoJSON,
+              {
+                featureProjection: "EPSG:3857"
+              }
+            );
 
-          // view.animate({
-          //   center: coordinate,
-          //   zoom: 13.65,
-          //   duration: 500
-          // });
+            gridSource.addFeature(gridFeature);
 
-          map.addLayer(layerGrid);
-          map.addOverlay(overlay);
-        }
+            layerGrid.unset("Source");
+            layerGrid.setSource(gridSource);
 
-        return { gridId };
-      });
+            overlay.setPosition(
+              fromLonLat(APIResultGrid.Data.gridCentroidLonLat)
+            );
+
+            // view.animate({
+            //   center: coordinate,
+            //   zoom: 13.65,
+            //   duration: 500
+            // });
+
+            map.addLayer(layerGrid);
+            map.addOverlay(overlay);
+          }
+
+          return { gridId };
+        });
+      };
     });
 
     return { popupContainer, gridId };

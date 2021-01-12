@@ -5,6 +5,7 @@
       :centerLon="centerLon"
       :centerLat="centerLat"
       :zoom="zoom"
+      :clickable="false"
     />
   </div>
   <!-- <div>
