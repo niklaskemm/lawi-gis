@@ -1,7 +1,7 @@
-import Api from "./api";
+import Api from "./api"
 
 export default {
-  getGridById(filter, geom) {
-    return Api().post(`/api/grid/bygeom`, { filter, geom });
+  getGridByGeom(filter, geom) {
+    return Api().post(`/api/grid/bygeom`, { filter, geom })
   }
-};
+}

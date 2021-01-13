@@ -1,9 +1,15 @@
 <template>
-  <div id="map" class="map"></div>
-  <div id="popupContainer" class="popup-container" ref="popupContainer">
-    <a href="#" id="popupCloser" class="popup-closer" @click="closePopup" />
-    <div id="popupContent" class="popup-content">
-      <h3>{{ gridId }}</h3>
+  <div>
+    <div id="map" class="map"></div>
+    <div id="popupContainer" class="popup-container" ref="popupContainer">
+      <!-- TODO add closePopup function -->
+      <a href="#" id="popupCloser" class="popup-closer" />
+      <div id="popupContent" class="popup-content">
+        <h3>Grid ID: {{ gridId }}</h3>
+        <h2>Niederschlag der letzten 14 Tage:</h2>
+        <h2>{{ radolanValue14 }}mm</h2>
+      </div>
+      <p>Mehr anzeigen</p>
     </div>
   </div>
 </template>
@@ -21,12 +27,14 @@ import { Attribution, defaults as defaultControls } from "ol/control";
 
 import { targetProjection } from "../utils/variables";
 import { getGridDataAtLocation } from "../utils/functions/getGridDataAtLocation";
+import { getRadolanDataAtLocation } from "../utils/functions/getRadolanDataAtLocation";
 
 export default defineComponent({
   name: "Map",
   props: {
     baseLayers: {
       // TODO get rid of 'any'... PropType?
+      // eslint-disable-next-line
       type: Array as any,
       required: true
     },
@@ -73,6 +81,7 @@ export default defineComponent({
     });
 
     const gridId = ref(0);
+    const radolanValue14 = ref(0);
 
     const mapOptions = {
       target: "map",
@@ -84,7 +93,7 @@ export default defineComponent({
 
     onMounted(() => {
       const map = new Map(mapOptions);
-
+      // eslint-disable-next-line
       overlay.setElement(popupContainer.value!);
 
       if (props.clickable) {
@@ -95,7 +104,12 @@ export default defineComponent({
             transform(coordinate, "EPSG:3857", targetProjection)
           );
 
+          const APIResultRadolan = await getRadolanDataAtLocation(
+            transform(coordinate, "EPSG:3857", targetProjection)
+          );
+
           gridId.value = APIResultGrid.Data.gridId;
+          radolanValue14.value = APIResultRadolan.Data.radolanValue14;
 
           try {
             map.removeLayer(layerGrid);
@@ -127,13 +141,11 @@ export default defineComponent({
             map.addLayer(layerGrid);
             map.addOverlay(overlay);
           }
-
-          return { gridId };
         });
-      };
+      }
     });
 
-    return { popupContainer, gridId };
+    return { popupContainer, gridId, radolanValue14 };
   }
 });
 </script>
@@ -178,5 +190,14 @@ export default defineComponent({
   border-width: 11px;
   left: 48px;
   margin-left: -11px;
+}
+.popup-closer {
+  text-decoration: none;
+  position: absolute;
+  top: 2px;
+  right: 8px;
+}
+.popup-closer:after {
+  content: "✖";
 }
 </style>
