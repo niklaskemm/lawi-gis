@@ -4,7 +4,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" scoped>
 import { defineComponent, onMounted } from "vue";
 
 // ! IMPORT OL CLASSES

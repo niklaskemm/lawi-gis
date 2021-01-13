@@ -9,7 +9,7 @@
         <h2>Niederschlag der letzten 14 Tage:</h2>
         <h2>{{ radolanValue14 }}mm</h2>
       </div>
-      <p>Mehr anzeigen</p>
+      <router-link :to="{ name: 'Grid', params: { gridId: gridId } }">Mehr anzeigen</router-link>
     </div>
   </div>
 </template>

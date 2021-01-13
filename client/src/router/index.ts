@@ -1,11 +1,10 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
-import Home from "../views/Home.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
     name: "Home",
-    component: Home
+    component: () => import("../views/Home.vue")
   },
   {
     path: "/about",
@@ -21,6 +20,15 @@ const routes: Array<RouteRecordRaw> = [
     path: "/testing",
     name: "Testing",
     component: () => import("../views/Testing.vue")
+  },
+  {
+    path: "/grid/:gridId",
+    name: "Grid",
+    component: () => import("../views/grid/_id/index.vue")
+  },
+  {
+    path: "/:catchAll(.*)",
+    component: () => import("../views/errors/notFound.vue")
   }
 ];
 
