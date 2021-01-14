@@ -1,6 +1,7 @@
 const UserController = require("../utils/controllers/UserController")
 const RadolanController = require("../utils/controllers/RadolanController")
 const GridController = require("../utils/controllers/GridController")
+const FieldController = require("../utils/controllers/FieldController")
 
 module.exports = (app) => {
   app.get("/api/radolan", RadolanController.index)
@@ -11,6 +12,8 @@ module.exports = (app) => {
   app.get("/api/grid", GridController.index)
   app.get("/api/grid/byid/:id", GridController.getGridById)
   app.post("/api/grid/bygeom", GridController.getGridByGeom)
+
+  app.post("/api/field/post", FieldController.postField)
 
   app.get("/api/users", UserController.index)
 }
