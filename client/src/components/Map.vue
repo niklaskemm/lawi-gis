@@ -25,6 +25,9 @@ import { Map, Overlay, View } from "ol";
 import { fromLonLat, transform } from "ol/proj";
 import { Vector as VectorSource } from "ol/source";
 import { Vector as VectorLayer } from "ol/layer";
+import { Draw, Modify, Snap } from 'ol/interaction';
+import GeometryType from "ol/geom/GeometryType";
+import {Circle as CircleStyle, Fill, Stroke, Style} from 'ol/style';
 import { Attribution, defaults as defaultControls } from "ol/control";
 
 import { targetProjection } from "../utils/variables";
@@ -82,12 +85,44 @@ export default defineComponent({
       updateWhileInteracting: true
     });
 
+    const sourceDraw = new VectorSource();
+    const layerDraw = new VectorLayer({
+      source: sourceDraw,
+      style: new Style({
+        fill: new Fill({
+          color: 'rgba(255, 255, 255, 0.2)',
+        }),
+        stroke: new Stroke({
+          color: '#ffcc33',
+          width: 2,
+        }),
+        image: new CircleStyle({
+          radius: 7,
+          fill: new Fill({
+            color: '#ffcc33',
+          }),
+        }),
+      }),
+    });
+
+    const layers = [] as any;
+
+    for (const baselayer of props.baseLayers) {
+      layers.push(baselayer);
+    };
+
+    layers.push(layerDraw);
+
+    const modify = new Modify({source: sourceDraw});
+
+    let draw, snap;
+
     const gridId = ref(0);
     const radolanValue14 = ref(0);
 
     const mapOptions = {
       target: "map",
-      layers: props.baseLayers,
+      layers: layers,
       overlay: [],
       view: view,
       controls: defaultControls({ attribution: false }).extend([attribution])
@@ -97,6 +132,19 @@ export default defineComponent({
       const map = new Map(mapOptions);
       // eslint-disable-next-line
       overlay.setElement(popupContainer.value!);
+      map.addInteraction(modify);
+
+      function addInteractions() {
+        draw = new Draw({
+          source: sourceDraw,
+          type: GeometryType.POLYGON,
+        });
+        map.addInteraction(draw);
+        snap = new Snap({source: sourceDraw});
+        map.addInteraction(snap);
+      };
+
+      addInteractions();
 
       if (props.clickable) {
         map.on("singleclick", async function(event) {
