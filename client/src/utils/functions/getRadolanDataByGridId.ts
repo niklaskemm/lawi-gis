@@ -1,8 +1,6 @@
 import RadolanService from "../services/RadolanService";
 
-export async function getRadolanDataByGridId(
-  gridId,
-  datetimes) {
+export async function getRadolanDataByGridId(gridId, datetimes) {
   // make POST request to backend server to retrieve filtered data
   const response = await RadolanService.getRadolanByGridId(gridId);
 

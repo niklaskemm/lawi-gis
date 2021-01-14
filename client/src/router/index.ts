@@ -17,9 +17,19 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("../views/Contact.vue")
   },
   {
+    path: "/clickmap",
+    name: "ClickMap",
+    component: () => import("../views/ClickMapView.vue")
+  },
+  {
+    path: "/drawmap",
+    name: "DrawMap",
+    component: () => import("../views/DrawMapView.vue")
+  },
+  {
     path: "/testing",
     name: "Testing",
-    component: () => import("../views/Testing.vue")
+    component: () => import("../views/TestMapView.vue")
   },
   {
     path: "/grid/:gridId",

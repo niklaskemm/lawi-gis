@@ -20,14 +20,16 @@
 import { defineComponent, onMounted, ref } from "vue";
 
 import "ol/ol.css";
+import { OSM } from "ol/source";
+import { Tile as TileLayer } from "ol/layer";
 import GeoJSON from "ol/format/GeoJSON";
 import { Map, Overlay, View } from "ol";
 import { fromLonLat, transform } from "ol/proj";
 import { Vector as VectorSource } from "ol/source";
 import { Vector as VectorLayer } from "ol/layer";
-import { Draw, Modify, Snap } from 'ol/interaction';
+import { Draw, Modify, Snap } from "ol/interaction";
 import GeometryType from "ol/geom/GeometryType";
-import {Circle as CircleStyle, Fill, Stroke, Style} from 'ol/style';
+import { Circle as CircleStyle, Fill, Stroke, Style } from "ol/style";
 import { Attribution, defaults as defaultControls } from "ol/control";
 
 import { targetProjection } from "../utils/variables";
@@ -35,14 +37,8 @@ import { getGridDataAtLocation } from "../utils/functions/getGridDataAtLocation"
 import { getRadolanDataAtLocation } from "../utils/functions/getRadolanDataAtLocation";
 
 export default defineComponent({
-  name: "Map",
+  name: "TestMap",
   props: {
-    baseLayers: {
-      // TODO get rid of 'any'... PropType?
-      // eslint-disable-next-line
-      type: Array as any,
-      required: true
-    },
     centerLon: {
       type: Number,
       default: 0
@@ -54,10 +50,6 @@ export default defineComponent({
     zoom: {
       type: Number,
       default: 10
-    },
-    clickable: {
-      type: Boolean,
-      default: true
     }
   },
 
@@ -90,39 +82,35 @@ export default defineComponent({
       source: sourceDraw,
       style: new Style({
         fill: new Fill({
-          color: 'rgba(255, 255, 255, 0.2)',
+          color: "rgba(255, 255, 255, 0.2)"
         }),
         stroke: new Stroke({
-          color: '#ffcc33',
-          width: 2,
+          color: "#ffcc33",
+          width: 2
         }),
         image: new CircleStyle({
           radius: 7,
           fill: new Fill({
-            color: '#ffcc33',
-          }),
-        }),
-      }),
+            color: "#ffcc33"
+          })
+        })
+      })
     });
 
-    const layers = [] as any;
-
-    for (const baselayer of props.baseLayers) {
-      layers.push(baselayer);
-    };
-
-    layers.push(layerDraw);
-
-    const modify = new Modify({source: sourceDraw});
+    const modify = new Modify({ source: sourceDraw });
 
     let draw, snap;
 
     const gridId = ref(0);
     const radolanValue14 = ref(0);
 
+    const layerOSM = new TileLayer({
+      source: new OSM()
+    });
+
     const mapOptions = {
       target: "map",
-      layers: layers,
+      layers: [layerOSM],
       overlay: [],
       view: view,
       controls: defaultControls({ attribution: false }).extend([attribution])
@@ -132,67 +120,66 @@ export default defineComponent({
       const map = new Map(mapOptions);
       // eslint-disable-next-line
       overlay.setElement(popupContainer.value!);
+      map.addLayer(layerDraw);
       map.addInteraction(modify);
 
       function addInteractions() {
         draw = new Draw({
           source: sourceDraw,
-          type: GeometryType.POLYGON,
+          type: GeometryType.POLYGON
         });
         map.addInteraction(draw);
-        snap = new Snap({source: sourceDraw});
+        snap = new Snap({ source: sourceDraw });
         map.addInteraction(snap);
-      };
+      }
 
       addInteractions();
 
-      if (props.clickable) {
-        map.on("singleclick", async function(event) {
-          const coordinate = event.coordinate;
+      map.on("singleclick", async function(event) {
+        const coordinate = event.coordinate;
 
-          const APIResultGrid = await getGridDataAtLocation(
-            transform(coordinate, "EPSG:3857", targetProjection)
+        const APIResultGrid = await getGridDataAtLocation(
+          transform(coordinate, "EPSG:3857", targetProjection)
+        );
+
+        const APIResultRadolan = await getRadolanDataAtLocation(
+          transform(coordinate, "EPSG:3857", targetProjection)
+        );
+
+        gridId.value = APIResultGrid.Data.gridId;
+        radolanValue14.value = APIResultRadolan.Data.radolanValue14;
+
+        try {
+          map.removeLayer(layerGrid);
+        } finally {
+          const gridSource = new VectorSource({});
+
+          const gridFeature = new GeoJSON().readFeature(
+            APIResultGrid.Data.gridExtentGeoJSON,
+            {
+              featureProjection: "EPSG:3857"
+            }
           );
 
-          const APIResultRadolan = await getRadolanDataAtLocation(
-            transform(coordinate, "EPSG:3857", targetProjection)
+          gridSource.addFeature(gridFeature);
+
+          layerGrid.unset("Source");
+          layerGrid.setSource(gridSource);
+
+          overlay.setPosition(
+            fromLonLat(APIResultGrid.Data.gridCentroidLonLat)
           );
 
-          gridId.value = APIResultGrid.Data.gridId;
-          radolanValue14.value = APIResultRadolan.Data.radolanValue14;
+          // view.animate({
+          //   center: coordinate,
+          //   zoom: 13.65,
+          //   duration: 500
+          // });
 
-          try {
-            map.removeLayer(layerGrid);
-          } finally {
-            const gridSource = new VectorSource({});
-
-            const gridFeature = new GeoJSON().readFeature(
-              APIResultGrid.Data.gridExtentGeoJSON,
-              {
-                featureProjection: "EPSG:3857"
-              }
-            );
-
-            gridSource.addFeature(gridFeature);
-
-            layerGrid.unset("Source");
-            layerGrid.setSource(gridSource);
-
-            overlay.setPosition(
-              fromLonLat(APIResultGrid.Data.gridCentroidLonLat)
-            );
-
-            // view.animate({
-            //   center: coordinate,
-            //   zoom: 13.65,
-            //   duration: 500
-            // });
-
-            map.addLayer(layerGrid);
-            map.addOverlay(overlay);
-          }
-        });
-      }
+          map.addLayer(layerGrid);
+          map.addOverlay(overlay);
+        }
+      });
     });
 
     return { popupContainer, gridId, radolanValue14 };

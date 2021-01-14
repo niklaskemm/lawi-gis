@@ -13,7 +13,7 @@ export function createDatetimeArray(
   const startDate = new Date(
     eventDate.setDate(eventDate.getUTCDate() - daysBefore)
   );
-  
+
   // const endDate = new Date(eventDate.setDate(eventDate.getUTCDate() + daysBefore));
   let startDateWithHours = new Date(startDate.setHours(0));
   let i = 0;
