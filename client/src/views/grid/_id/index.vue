@@ -12,6 +12,7 @@ import { defineComponent, onMounted, ref } from "vue";
 import { Chart } from "chart.js";
 import { useRoute } from "vue-router";
 import { getRadolanDataByGridId } from "../../../utils/functions/getRadolanDataByGridId";
+import { createDatetimeArray } from "../../../utils/functions/createDatetimeArray";
 
 export default defineComponent({
   name: "indexGrid",
@@ -19,22 +20,33 @@ export default defineComponent({
 
   setup() {
     const chart = ref(null);
+    const route = useRoute();
+    const gridId = route.params.gridId;
+
+    const date = new Date();
+    const daysBefore = 14;
+    const includeAfter = false;
+
+    const datetimes = createDatetimeArray(date, daysBefore, includeAfter);
+
+    let days = daysBefore;
+
+    if (includeAfter) {
+      days = daysBefore * 2;
+    }
 
     onMounted(async () => {
-      const route = useRoute();
-      const APIResultRadolan = await getRadolanDataByGridId(
-        route.params.gridId
-      );
+      const APIResultRadolan = await getRadolanDataByGridId(gridId, datetimes);
 
-      const timestampsHourly = APIResultRadolan.Data.datetimes;
+      const timestampsHourly = datetimes;
       const valuesHourly = APIResultRadolan.Data.values;
-      
+
       // eslint-disable-next-line
       const timestampsDaily = [] as any;
       // eslint-disable-next-line
       const valuesDaily = [] as any;
 
-      for (let i = 0; i < 14; i++) {
+      for (let i = 0; i < days; i++) {
         let sum = 0;
         timestampsDaily.push(timestampsHourly[i * 24].split("T")[0]);
         for (let j = 0; j < 24; j++) {

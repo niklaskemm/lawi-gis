@@ -1,11 +1,11 @@
 import RadolanService from "../services/RadolanService";
-import { createDatetimeArray } from "./createDatetimeArray";
 
-export async function getRadolanDataByGridId(gridId) {
+export async function getRadolanDataByGridId(
+  gridId,
+  datetimes) {
   // make POST request to backend server to retrieve filtered data
   const response = await RadolanService.getRadolanByGridId(gridId);
 
-  const datetimes = createDatetimeArray(14);
   // eslint-disable-next-line
   const values = [] as any;
 
@@ -28,7 +28,6 @@ export async function getRadolanDataByGridId(gridId) {
   });
 
   const Data = {
-    datetimes: datetimes,
     values: values
   };
 
