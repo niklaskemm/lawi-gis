@@ -22,7 +22,7 @@ export async function getRadolanDataAtLocation(
     const dtObject = new Date(element.time).getTime();
     const diffDays = (today - dtObject) / (1000 * 3600 * 24);
     if (diffDays <= 14) {
-      Data.radolanValue14 += element.value
+      Data.radolanValue14 += element.value;
     }
   });
 

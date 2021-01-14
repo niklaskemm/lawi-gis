@@ -37,7 +37,8 @@ module.exports = {
       const data = await RadolanData.findAll({
         where: {
           grid_id: grid_id
-        }
+        },
+        order: [["time", "ASC"]]
       })
       if (data) {
         res.send(data)
