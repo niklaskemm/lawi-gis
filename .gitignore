@@ -4,7 +4,7 @@ node_modules
 temp
 
 # local config, env and TODO files
-config.*
+*config.*
 .env
 
 # Log files
