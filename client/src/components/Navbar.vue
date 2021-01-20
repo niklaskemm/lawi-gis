@@ -18,11 +18,11 @@
 </template>
 
 <script>
-import { defineComponent } from "vue";
+import { defineComponent } from "vue"
 
 export default defineComponent({
-  name: "Navbar"
-});
+  name: "Navbar",
+})
 </script>
 
 <style lang="scss" scoped>

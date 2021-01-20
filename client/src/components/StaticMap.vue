@@ -9,9 +9,7 @@
         <h2>Niederschlag der letzten 14 Tage:</h2>
         <h2>{{ radolanValue14 }}mm</h2>
       </div>
-      <router-link :to="{ name: 'Grid', params: { gridId: gridId } }"
-        >Mehr anzeigen</router-link
-      >
+      <router-link :to="{ name: 'Grid', params: { gridId: gridId } }">Mehr anzeigen</router-link>
     </div>
   </div>
 </template>
@@ -25,7 +23,7 @@ import { Map, Overlay, View } from "ol";
 import { fromLonLat, transform } from "ol/proj";
 import { Vector as VectorSource } from "ol/source";
 import { Vector as VectorLayer } from "ol/layer";
-import { Draw, Modify, Snap } from "ol/interaction";
+import { Draw, Modify, Snap, defaults as defaultInteractions } from "ol/interaction";
 import GeometryType from "ol/geom/GeometryType";
 import { Circle as CircleStyle, Fill, Stroke, Style } from "ol/style";
 import { Attribution, defaults as defaultControls } from "ol/control";
@@ -120,7 +118,7 @@ export default defineComponent({
     const gridId = ref(0);
     const radolanValue14 = ref(0);
 
-    const interactions = ol.interaction.defaults({
+    const interactions = defaultInteractions({
       doubleClickZoom: false,
       mouseWheelZoom: false
     });
@@ -153,7 +151,7 @@ export default defineComponent({
       addInteractions();
 
       if (props.clickable) {
-        map.on("singleclick", async function(event) {
+        map.on("singleclick", async function (event) {
           const coordinate = event.coordinate;
 
           const APIResultGrid = await getGridDataAtLocation(
