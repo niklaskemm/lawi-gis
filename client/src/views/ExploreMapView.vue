@@ -1,21 +1,17 @@
 <template>
   <div>
-    <click-map
-      :centerLon="centerLon"
-      :centerLat="centerLat"
-      :zoom="zoom"
-    />
+    <explore-map :centerLon="centerLon" :centerLat="centerLat" :zoom="zoom" />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import ClickMap from "../components/ClickMap.vue";
+import ExploreMap from "../components/ExploreMap.vue";
 
 export default defineComponent({
-  name: "ClickMapView",
+  name: "ExploreMapView",
   components: {
-    ClickMap
+    ExploreMap
   },
 
   setup() {

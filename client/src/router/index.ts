@@ -17,9 +17,9 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("../views/Contact.vue")
   },
   {
-    path: "/clickmap",
-    name: "ClickMap",
-    component: () => import("../views/ClickMapView.vue")
+    path: "/explore",
+    name: "Explore",
+    component: () => import("../views/ExploreMapView.vue")
   },
   {
     path: "/drawmap",

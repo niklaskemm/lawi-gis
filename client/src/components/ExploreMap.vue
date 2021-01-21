@@ -28,11 +28,15 @@ import { Vector as VectorLayer } from "ol/layer";
 import { Attribution, defaults as defaultControls } from "ol/control";
 
 import { targetProjection } from "../utils/variables";
-import { getGridDataAtLocation } from "../utils/functions/getGridDataAtLocation";
-import { getRadolanDataAtLocation } from "../utils/functions/getRadolanDataAtLocation";
+import {
+  getGridDataAtLocation
+} from "../utils/functions/getGridDataAtLocation";
+import {
+  getRadolanDataAtLocation
+} from "../utils/functions/getRadolanDataAtLocation";
 
 export default defineComponent({
-  name: "ClickMap",
+  name: "ExploreMap",
   props: {
     centerLon: {
       type: Number,
