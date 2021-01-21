@@ -43,6 +43,8 @@ import {
 import { Attribution, defaults as defaultControls } from "ol/control";
 import GeoJSON from "ol/format/GeoJSON";
 
+import FieldService from "../utils/services/FieldService";
+
 import { BingMapsApiKey } from "../../src/api_key_config.js";
 
 export default defineComponent({
@@ -139,12 +141,16 @@ export default defineComponent({
     const fieldName = ref("");
     const featureGeom = ref(String as any);
 
-    function saveFeature() {
+    async function saveFeature() {
       const feature = select.getFeatures().getArray()[0]
-      const fieldGeomGeoJSON = new GeoJSON().writeFeature(feature, {
+      const fieldGeomGeoJSON = JSON.parse(new GeoJSON().writeFeature(feature, {
         featureProjection: "EPSG:3857"
-      });
-      console.log(fieldName.value, fieldGeomGeoJSON);
+      }));
+      const info = {
+        "name": fieldName.value,
+        "geom": fieldGeomGeoJSON.geometry
+      };
+      await FieldService.postField(info);
     }
 
     function deleteFeature() {
