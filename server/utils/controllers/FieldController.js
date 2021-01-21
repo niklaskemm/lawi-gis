@@ -12,6 +12,44 @@ module.exports = {
     }
   },
 
+  async getFieldArea(req, res) {
+    const { id } = req.params
+    try {
+      const [data, metadata] = await db.sequelize.query(
+        `SELECT ST_AREA(ST_TRANSFORM(f.geom, 'EPSG:25832')) FROM fields f where f.id = ${id}`
+      )
+      if (data) {
+        res.send(data)
+      } else {
+        res.status(404).send("No data found.")
+      }
+    } catch (err) {
+      if ((err.name = "SequelizeDatabaseError")) {
+        res.status(400).send(`Invalid input syntax for type integer: "${id}"`)
+      } else {
+        res.status(503).send({ error: err })
+      }
+    }
+  },
+
+  async getFieldById(req, res) {
+    const { id } = req.params
+    try {
+      const field = await Field.findByPk(id)
+      if (field) {
+        res.send(field)
+      } else {
+        res.status(404).send("No data found.")
+      }
+    } catch (err) {
+      if ((err.name = "SequelizeDatabaseError")) {
+        res.status(400).send(`Invalid input syntax for type integer: "${id}"`)
+      } else {
+        res.status(503).send({ error: err })
+      }
+    }
+  },
+
   async postField(req, res) {
     try {
       const field = await Field.create(req.body)
