@@ -17,6 +17,12 @@ module.exports = (app) => {
   app.post("/api/grids/get/bygeom", GridController.getGridByGeom)
 
   app.get("/api/fields/get", FieldController.index)
+  app.get("/api/fields/get/byid/:id", FieldController.getFieldById)
+  app.get("/api/fields/get/area/:id", FieldController.getFieldArea)
+  app.post(
+    "/api/fields/get/intersectionarea",
+    FieldController.getIntersectionArea
+  )
   app.post("/api/fields/post", FieldController.postField)
 
   app.get("/api/users/get", UserController.index)
