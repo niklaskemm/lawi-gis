@@ -22,14 +22,24 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("../views/DrawMapView.vue")
   },
   {
-    path: "/testing",
-    name: "Testing",
-    component: () => import("../views/TestMapView.vue")
-  },
-  {
     path: "/grid/:gridId",
     name: "Grid",
     component: () => import("../views/grid/_id/index.vue")
+  },
+  {
+    path: "/user/:userId",
+    name: "User",
+    component: () => import("../views/user/_id/index.vue")
+  },
+  {
+    path: "/field/:fieldId",
+    name: "Field",
+    component: () => import("../views/field/_id/index.vue")
+  },
+  {
+    path: "/testing",
+    name: "Testing",
+    component: () => import("../views/TestMapView.vue")
   },
   {
     path: "/:catchAll(.*)",
