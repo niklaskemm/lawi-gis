@@ -8,9 +8,6 @@
         <router-link class="navbar__link" to="/about">About</router-link>
       </li>
       <li class="navbar__item">
-        <router-link class="navbar__link" to="/contact">Contact</router-link>
-      </li>
-      <li class="navbar__item">
         <router-link class="navbar__link" to="/testing">Testing</router-link>
       </li>
     </ul>
