@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
+import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router"
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -39,17 +39,17 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/testing",
     name: "Testing",
-    component: () => import("../views/TestMapView.vue")
+    component: () => import("../views/TestView.vue")
   },
   {
     path: "/:catchAll(.*)",
     component: () => import("../views/errors/notFound.vue")
   }
-];
+]
 
 const router = createRouter({
   history: createWebHistory(),
   routes
-});
+})
 
-export default router;
+export default router
