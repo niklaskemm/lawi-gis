@@ -11,8 +11,21 @@
 import { defineComponent, onMounted, ref } from "vue";
 import { Chart } from "chart.js";
 import { useRoute } from "vue-router";
-import { getRadolanDataByGridId } from "../../../utils/functions/getRadolanDataByGridId";
-import { createDatetimeArray } from "../../../utils/functions/createDatetimeArray";
+import {
+  getRadolanDataByGridId
+} from "../../../utils/functions/getRadolanDataByGridId";
+import {
+  createDatetimeArray
+} from "../../../utils/functions/helper/createDatetimeArray";
+import {
+  createStartEndDateString
+} from "../../../utils/functions/helper/createStartEndDateString";
+import {
+  createRadolanHourlyValuesArray
+} from "../../../utils/functions/helper/createRadolanHourlyValuesArray";
+import {
+  createRadolanDailyValuesArray
+} from "../../../utils/functions/helper/createRadolanDailyValuesArray";
 
 export default defineComponent({
   name: "indexGrid",
@@ -21,39 +34,20 @@ export default defineComponent({
   setup() {
     const chart = ref(null);
     const route = useRoute();
-    const gridId = route.params.gridId;
+    const gridId = parseInt(route.params.gridId.toString());
 
-    const date = new Date();
-    const daysBefore = 14;
-    const includeAfter = false;
+    const numberOfDays = 14;
+    const { startDateString, endDateString } = createStartEndDateString(numberOfDays)
 
-    const datetimes = createDatetimeArray(date, daysBefore, includeAfter);
-
-    let days = daysBefore;
-
-    if (includeAfter) {
-      days = daysBefore * 2;
-    }
 
     onMounted(async () => {
-      const APIResultRadolan = await getRadolanDataByGridId(gridId, datetimes);
+      const APIResultRadolan = await getRadolanDataByGridId(gridId, startDateString, endDateString);
+      const radolan = APIResultRadolan.response.data
 
-      const timestampsHourly = datetimes;
-      const valuesHourly = APIResultRadolan.Data.values;
+      const { timestampsHourly, timestampsDaily } = createDatetimeArray()
 
-      // eslint-disable-next-line
-      const timestampsDaily = [] as any;
-      // eslint-disable-next-line
-      const valuesDaily = [] as any;
-
-      for (let i = 0; i < days; i++) {
-        let sum = 0;
-        timestampsDaily.push(timestampsHourly[i * 24].split("T")[0]);
-        for (let j = 0; j < 24; j++) {
-          sum += valuesHourly[i * 24 + j];
-        }
-        valuesDaily.push(sum);
-      }
+      const radolanHourlyValuesArray = createRadolanHourlyValuesArray(radolan, timestampsHourly)
+      const radolanDailyValuesArray = createRadolanDailyValuesArray(radolanHourlyValuesArray)
 
       // eslint-disable-next-line
       const myChart = new Chart(chart.value!, {
@@ -63,13 +57,13 @@ export default defineComponent({
           datasets: [
             {
               type: "line",
-              data: valuesDaily,
+              data: radolanDailyValuesArray,
               borderColor: "blue",
               fill: false
             },
             {
               type: "bar",
-              data: valuesDaily,
+              data: radolanDailyValuesArray,
               backgroundColor: "lightblue"
             }
           ]
