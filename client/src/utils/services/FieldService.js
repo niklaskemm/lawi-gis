@@ -5,19 +5,19 @@ export default {
   //   return Api().post("/api/fields/get/bygeom", { filter, geom })
   // },
 
-  postField(info) {
-    return Api().post("/api/fields/post", info)
+  postField(field) {
+    return Api().post("/api/fields/post", field)
   },
 
   getFieldById(fieldId) {
     return Api().get(`/api/fields/get/byid/${fieldId}`)
   },
 
-  getFieldArea(fieldId) {
+  getFieldAreaById(fieldId) {
     return Api().get(`/api/fields/get/area/${fieldId}`)
   },
 
-  getIntersectionArea(gridId, fieldId) {
-    return Api().post("/api/fields/get/area", (gridId, fieldId))
+  getIntersectionAreaById(gridId, fieldId) {
+    return Api().post("/api/fields/get/intersectionarea", { gridId, fieldId })
   }
 }

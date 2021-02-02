@@ -1,11 +1,23 @@
 import Api from "./api"
 
 export default {
-  getRadolanByGeom(filter, geom) {
-    return Api().post("/api/radolan/get/bygeom", { filter, geom })
+  getRadolanById(id) {
+    return Api().get("/api/radolan/get/byid/:id", id)
   },
 
-  getRadolanByGridId(gridId) {
-    return Api().get(`/api/radolan/get/bygridid/${gridId}`)
+  getRadolanByGeom(geom, startDate, endDate) {
+    return Api().post("/api/radolan/get/bygeom", { geom, startDate, endDate })
+  },
+
+  getRadolanByGridId(gridId, startDate, endDate) {
+    return Api().post("/api/radolan/get/bygridid", {
+      gridId,
+      startDate,
+      endDate
+    })
   }
+
+  // getRadolanByFieldId(fieldId, startDate, endDate) {
+  //   return Api().post("/api/radolan/get/byfieldid", { fieldId, startDate, endDate })
+  // }
 }
