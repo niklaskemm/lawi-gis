@@ -3,10 +3,10 @@
     <div id="map" class="map"></div>
     <div id="popupContainer" class="popup-container" ref="popupContainer">
       <!-- TODO add closePopup function -->
-      <a href="#" id="popupCloser" class="popup-closer" />
+      <a href="#" id="popupCloser" class="popup-closer" @click="closePopup" />
       <div id="popupContent" class="popup-content">
         <h3>Grid ID: {{ gridId }}</h3>
-        <h2>Niederschlag der letzten 14 Tage:</h2>
+        <h2>Niederschlag der letzten {{numberOfDays}} Tage:</h2>
         <h2>{{ radolanValue14 }}mm</h2>
       </div>
       <router-link :to="{ name: 'Grid', params: { gridId: gridId } }">Mehr anzeigen</router-link>
@@ -20,6 +20,7 @@ import { defineComponent, onMounted, ref } from "vue";
 import "ol/ol.css";
 import GeoJSON from "ol/format/GeoJSON";
 import { Map, Overlay, View } from "ol";
+import { Point } from "ol/geom";
 import { OSM } from "ol/source";
 import { Tile as TileLayer } from "ol/layer";
 import { fromLonLat, transform } from "ol/proj";
@@ -29,11 +30,14 @@ import { Attribution, defaults as defaultControls } from "ol/control";
 
 import { targetProjection } from "../utils/variables";
 import {
-  getGridDataAtLocation
-} from "../utils/functions/getGridDataAtLocation";
+  getGridByGeom
+} from "../utils/functions/getGridByGeom";
 import {
-  getRadolanDataAtLocation
-} from "../utils/functions/getRadolanDataAtLocation";
+  getRadolanDataByGeom
+} from "../utils/functions/getRadolanDataByGeom";
+import {
+  createStartEndDateString
+} from "../utils/functions/helper/createStartEndDateString";
 
 export default defineComponent({
   name: "ExploreMap",
@@ -91,24 +95,45 @@ export default defineComponent({
       controls: defaultControls({ attribution: false }).extend([attribution])
     };
 
+    function closePopup() {
+      overlay.setPosition(undefined);
+    }
+
+    const numberOfDays = ref(14);
+    const { startDateString, endDateString } = createStartEndDateString(numberOfDays.value)
+    // const endDate = createStartEndDateString(numberOfDays.value).endDate
+
     onMounted(() => {
       const map = new Map(mapOptions);
       // eslint-disable-next-line
       overlay.setElement(popupContainer.value!);
 
       map.on("click", async function (event) {
-        const coordinate = event.coordinate;
+        const coordinate = new Point(
+          event.coordinate
+        ).transform("EPSG:3857", targetProjection);
+        const coordinateGeoJSON = new GeoJSON().writeGeometryObject(coordinate);
 
-        const APIResultGrid = await getGridDataAtLocation(
-          transform(coordinate, "EPSG:3857", targetProjection)
+        const APIResultGrid = await getGridByGeom(coordinateGeoJSON);
+        const grid = APIResultGrid.response.data.rows[0]
+
+        const APIResultRadolan = await getRadolanDataByGeom(
+          coordinateGeoJSON,
+          startDateString,
+          endDateString
         );
+        const radolan = APIResultRadolan.response.data.rows
 
-        const APIResultRadolan = await getRadolanDataAtLocation(
-          transform(coordinate, "EPSG:3857", targetProjection)
+        gridId.value = grid.id;
+        radolanValue14.value = 0
+
+        radolan.forEach((element) => {
+          radolanValue14.value += element.value
+        })
+
+        const centroid = new GeoJSON().readFeature(
+          grid.centroid, { featureProjection: "EPSG:3857" }
         );
-
-        gridId.value = APIResultGrid.Data.gridId;
-        radolanValue14.value = APIResultRadolan.Data.radolanValue14;
 
         try {
           map.removeLayer(layerGrid);
@@ -116,10 +141,7 @@ export default defineComponent({
           const gridSource = new VectorSource({});
 
           const gridFeature = new GeoJSON().readFeature(
-            APIResultGrid.Data.gridExtentGeoJSON,
-            {
-              featureProjection: "EPSG:3857"
-            }
+            grid.geom, { featureProjection: "EPSG:3857" }
           );
 
           gridSource.addFeature(gridFeature);
@@ -127,23 +149,19 @@ export default defineComponent({
           layerGrid.unset("Source");
           layerGrid.setSource(gridSource);
 
-          overlay.setPosition(
-            fromLonLat(APIResultGrid.Data.gridCentroidLonLat)
-          );
-
-          // view.animate({
-          //   center: coordinate,
-          //   zoom: 13.65,
-          //   duration: 500
-          // });
-
-          map.addLayer(layerGrid);
-          map.addOverlay(overlay);
+          overlay.setPosition(event.coordinate);
         }
-      });
-    });
-
-    return { popupContainer, gridId, radolanValue14 };
+        map.addLayer(layerGrid);
+        map.addOverlay(overlay);
+      })
+    })
+    return {
+      popupContainer,
+      gridId,
+      radolanValue14,
+      numberOfDays,
+      closePopup
+    };
   }
 });
 </script>
