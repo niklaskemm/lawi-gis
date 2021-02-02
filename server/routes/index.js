@@ -2,14 +2,13 @@ const UserController = require("../utils/controllers/UserController")
 const RadolanController = require("../utils/controllers/RadolanController")
 const GridController = require("../utils/controllers/GridController")
 const FieldController = require("../utils/controllers/FieldController")
+const MiscController = require("../utils/controllers/MiscController")
 
 module.exports = (app) => {
   app.get("/api/radolan/get", RadolanController.index)
   app.get("/api/radolan/get/byid/:id", RadolanController.getDataById)
-  app.get(
-    "/api/radolan/get/bygridid/:grid_id",
-    RadolanController.getDataByGridId
-  )
+  app.post("/api/radolan/get/bygridid", RadolanController.getDataByGridId)
+  // app.post("/api/radolan/get/byfieldid", RadolanController.getDataByFieldId)
   app.post("/api/radolan/get/bygeom", RadolanController.getDataByGeom)
 
   app.get("/api/grids/get", GridController.index)
@@ -18,12 +17,14 @@ module.exports = (app) => {
 
   app.get("/api/fields/get", FieldController.index)
   app.get("/api/fields/get/byid/:id", FieldController.getFieldById)
-  app.get("/api/fields/get/area/:id", FieldController.getFieldArea)
-  app.post(
-    "/api/fields/get/intersectionarea",
-    FieldController.getIntersectionArea
-  )
+  app.get("/api/fields/get/area/:id", FieldController.getFieldAreaById)
+  app.post("/api/fields/get/bygeom", FieldController.getFieldByGeom)
   app.post("/api/fields/post", FieldController.postField)
 
   app.get("/api/users/get", UserController.index)
+
+  app.post(
+    "/api/misc/get/intersectionarea",
+    MiscController.getIntersectionAreaByIds
+  )
 }

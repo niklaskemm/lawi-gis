@@ -31,22 +31,20 @@ module.exports = {
   },
 
   async getGridByGeom(req, res) {
-    const { filter } = req.body
     const { geom } = req.body
     try {
       const [data, metadata] = await db.sequelize.query(
-        `SELECT ${filter} FROM gridgeoms g WHERE ST_INTERSECTS(g.geom, ST_GEOMFROMTEXT('${geom}', 4326))`
+        `SELECT * FROM gridgeoms g WHERE ST_INTERSECTS(g.geom, ST_GEOMFROMTEXT('${geom}', 4326))`
       )
       // metadata contains .rows with the same info as in data
-      if (data) {
+      if (data[0]) {
         res.send(metadata)
-        // console.log(metadata.rowCount)
       } else {
         res.status(404).send("No data found.")
       }
     } catch (err) {
       if ((err.name = "SequelizeDatabaseError")) {
-        res.status(400).send(`Invalid input syntax for type integer: "${geom}"`)
+        res.status(400).send(`Invalid input syntax for "${geom}"`)
       } else {
         res.status(503).send({ error: err })
       }

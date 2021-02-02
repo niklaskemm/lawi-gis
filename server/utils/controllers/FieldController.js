@@ -23,55 +23,47 @@ module.exports = {
       }
     } catch (err) {
       if ((err.name = "SequelizeDatabaseError")) {
-        res.status(400).send(`Invalid input syntax for type integer: "${id}"`)
+        res.status(400).send(`Invalid input syntax for id: "${id}"`)
       } else {
         res.status(503).send({ error: err })
       }
     }
   },
 
-  async getFieldArea(req, res) {
+  async getFieldByGeom(req, res) {
+    const { geom } = req.body
+    try {
+      const [data, metadata] = await db.sequelize.query(
+        `SELECT * FROM fields f WHERE ST_INTERSECTS(f.geom, ST_GEOMFROMTEXT('${geom}', 4326))`
+      )
+      if (data[0]) {
+        res.send(data)
+      } else {
+        res.status(404).send("No data found.")
+      }
+    } catch (err) {
+      if ((err.name = "SequelizeDatabaseError")) {
+        res.status(400).send(`Invalid input syntax for geom: "${geom}"`)
+      } else {
+        res.status(503).send({ error: err })
+      }
+    }
+  },
+
+  async getFieldAreaById(req, res) {
     const { id } = req.params
     try {
       const [data, metadata] = await db.sequelize.query(
         `SELECT ST_AREA(ST_TRANSFORM(f.geom, 'EPSG:25832')) FROM fields f where f.id = '${id}'`
       )
-      if (data) {
+      if (data[0]) {
         res.send(data)
       } else {
         res.status(404).send("No data found.")
       }
     } catch (err) {
       if ((err.name = "SequelizeDatabaseError")) {
-        res.status(400).send(`Invalid input syntax for type integer: "${id}"`)
-      } else {
-        res.status(503).send({ error: err })
-      }
-    }
-  },
-
-  async getIntersectionArea(req, res) {
-    try {
-      const { fieldId } = req.body
-      const { gridId } = req.body
-      const [data, metadata] = await db.sequelize.query(
-        `SELECT ST_AREA(
-          ST_TRANSFORM(
-            ST_INTERSECTION(
-              (SELECT g.geom FROM gridgeoms g WHERE g.id = '${gridId}'),
-              (SELECT f.geom FROM fields f WHERE f.id = '${fieldId}')
-            ), 'EPSG:25832'
-          )
-        )`
-      )
-      if (data) {
-        res.send(data)
-      } else {
-        res.status(404).send("No data found.")
-      }
-    } catch (err) {
-      if ((err.name = "SequelizeDatabaseError")) {
-        res.status(400).send(`Invalid input syntax for type integer: "${geom}"`)
+        res.status(400).send(`Invalid input syntax for id: "${id}"`)
       } else {
         res.status(503).send({ error: err })
       }
