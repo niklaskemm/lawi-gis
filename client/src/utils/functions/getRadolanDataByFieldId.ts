@@ -1,7 +1,17 @@
 import { getPercentPerGrid } from "./helper/getPercentPerGrid"
 import { getRadolanDataByGridId } from "./getRadolanDataByGridId"
 import { createDatetimeArray } from "./helper/createDatetimeArray"
-import RadolanService from "../services/RadolanService"
+import {
+  createRadolanHourlyValuesArray //
+} from "./helper/createRadolanHourlyValuesArray"
+import {
+  createRadolanDailyValuesArray //
+} from "./helper/createRadolanDailyValuesArray"
+
+function round(value, precision = 0) {
+  const multiplier = Math.pow(10, precision)
+  return Math.round(value * multiplier) / multiplier
+}
 
 export async function getRadolanDataByFieldId(
   fieldId: string,
@@ -12,45 +22,90 @@ export async function getRadolanDataByFieldId(
   const daysBefore = 14
   const includeAfter = false
 
+  const { timestampsDaily, timestampsHourly } = createDatetimeArray(
+    date,
+    daysBefore,
+    includeAfter
+  )
   const idPercent = await getPercentPerGrid(fieldId)
-  const datetimes = await createDatetimeArray(date, daysBefore, includeAfter)
 
-  // const radolanDataPerGrid = 0
-  // const radolanDataPerGridComplete = 0
-  const radolanDataPerGridDaily = 0
-  const radolanDataPerGridHourly = 0
+  const gridDataComplete = [] as any
 
-  const radolanDataPerGridWeighted = 0
-  const radolanDataPerGridWeightedComplete = 0
-  const radolanDataPerGridWeightedDaily = 0
-  const radolanDataPerGridWeightedHourly = 0
+  for (const grid of idPercent) {
+    const radolanDataPerGrid = await getRadolanDataByGridId(
+      grid.gridId,
+      startDateString,
+      endDateString
+    )
 
-  const radolanDataPerField = 0
-  const radolanDataPerFieldComplete = 0
-  const radolanDataPerFieldDaily = 0
-  const radolanDataPerFieldHourly = 0
-  // datetimes.length
+    const radolan = radolanDataPerGrid.response.data
 
-  setTimeout(async () => {
-    for (let element of idPercent) {
-      const radolanDataPerGrid = await getRadolanDataByGridId(
-        element.gridId,
-        startDateString,
-        endDateString
-      )
+    let sum = 0
+    radolan.forEach((element) => {
+      sum += element.value
+    })
 
-      let radolanDataPerGridComplete = 0
-      radolanDataPerGrid.response.data.values.forEach((value) => {
-        radolanDataPerGridComplete += value
-      })
-      console.log(element.gridId, radolanDataPerGridComplete)
+    const radolanHourlyValuesArray = createRadolanHourlyValuesArray(
+      radolan,
+      timestampsHourly
+    )
+    const radolanDailyValuesArray = createRadolanDailyValuesArray(
+      radolanHourlyValuesArray
+    )
 
-      // let weightedSum = 0
-      // weightedSum = sumValues * element.percent
-      // totalweightedSums += weightedSum
+    const gridData = {
+      gridId: grid.gridId,
+      percent: grid.percent,
+      complete: sum,
+      daily: radolanDailyValuesArray,
+      hourly: radolanHourlyValuesArray
     }
-    // console.log(idPercent.length)
-    // totalRain = totalweightedSums / idPercent.length
-    // console.log(totalRain / daysBefore)
-  }, 100)
+    gridDataComplete.push(gridData)
+  }
+
+  const fieldDaily = [] as any
+  const fieldHourly = [] as any
+
+  let fieldComplete = 0
+
+  for (let i = 0; i < daysBefore; i++) {
+    fieldDaily.push(0)
+    for (let x = 0; x < 24; x++) {
+      fieldHourly.push(0)
+    }
+  }
+
+  for (const grid of gridDataComplete) {
+    const percent = grid.percent / 100
+    fieldComplete += round(percent * grid.complete, 1)
+
+    const gridDailyWeighted = [] as any
+    for (const day of grid.daily) {
+      gridDailyWeighted.push(percent * day)
+    }
+
+    gridDailyWeighted.forEach((value, index) => {
+      fieldDaily[index] += round(value, 4)
+    })
+
+    const gridHourlyWeighted = [] as any
+    for (const hour of grid.hourly) {
+      gridHourlyWeighted.push(percent * hour)
+    }
+
+    gridHourlyWeighted.forEach((value, index) => {
+      fieldHourly[index] += round(value, 1)
+    })
+  }
+
+  const response = {
+    fieldId: fieldId,
+    complete: fieldComplete,
+    timestampsDaily: timestampsDaily,
+    timestampsHourly: timestampsHourly,
+    radolanDaily: fieldDaily,
+    radolanHourly: fieldHourly
+  }
+
+  return response
 }

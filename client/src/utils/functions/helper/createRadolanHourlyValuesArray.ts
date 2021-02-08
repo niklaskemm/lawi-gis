@@ -3,7 +3,7 @@ export function createRadolanHourlyValuesArray(
   datetimeArray
 ) {
   // eslint-disable-next-line
-  const radolanHourlyValuesArray: Array<number> = []
+  const radolanHourlyValuesArray = [] as any
   // eslint-disable-next-line
   const datetimesSplit = [] as any
   datetimeArray.forEach((timestamp) => {

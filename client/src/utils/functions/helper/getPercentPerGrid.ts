@@ -14,7 +14,7 @@ export async function getPercentPerGrid(fieldId: string) {
 
   const idPercent = [] as any
 
-  gridList.forEach(async (element) => {
+  for (const element of gridList) {
     const intersectionArea = (
       await MiscService.getIntersectionAreaById(element.id, fieldId)
     ).data[0].st_area
@@ -24,7 +24,7 @@ export async function getPercentPerGrid(fieldId: string) {
       ) / 10000
     const data = { gridId: element.id, percent: percent }
     idPercent.push(data)
-  })
+  }
 
   return idPercent
 }
