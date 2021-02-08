@@ -59,7 +59,7 @@ module.exports = {
       if ((err.name = "SequelizeDatabaseError")) {
         res
           .status(400)
-          .send(`Invalid input syntax for type integer: "${grid_id}"`)
+          .send(`Invalid input syntax for type integer: "${gridId}"`)
       } else {
         res.status(503).send({ error: err })
       }
