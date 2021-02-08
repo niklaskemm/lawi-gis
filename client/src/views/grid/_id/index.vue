@@ -3,14 +3,15 @@
 <template>
   <div>
     <h1>{{ $route.params.gridId }}</h1>
-    <canvas ref="chart"></canvas>
+    <h2>{{ complete }}</h2>
+    <my-chart :labels="timestampsDaily" :data="radolanDailyValuesArray" />
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
-import { Chart } from "chart.js";
+import { defineComponent, ref } from "vue";
 import { useRoute } from "vue-router";
+import MyChart from "../../../components/chart.vue"
 import {
   getRadolanDataByGridId
 } from "../../../utils/functions/getRadolanDataByGridId";
@@ -29,56 +30,31 @@ import {
 
 export default defineComponent({
   name: "indexGrid",
-  components: {},
+  components: {
+    MyChart
+  },
 
-  setup() {
-    const chart = ref(null);
+  async setup() {
     const route = useRoute();
     const gridId = parseInt(route.params.gridId.toString());
+
+    const radolanDailyValuesArray = ref([]);
+    const timestampsDaily = ref([])
 
     const numberOfDays = 14;
     const { startDateString, endDateString } = createStartEndDateString(numberOfDays)
 
+    const { timestampsHourly } = createDatetimeArray()
+    timestampsDaily.value = createDatetimeArray().timestampsDaily
+    const APIResultRadolan = await getRadolanDataByGridId(gridId, startDateString, endDateString)
+    const radolan = APIResultRadolan.response.data
 
-    onMounted(async () => {
-      const APIResultRadolan = await getRadolanDataByGridId(gridId, startDateString, endDateString);
-      const radolan = APIResultRadolan.response.data
+    const radolanHourlyValuesArray = createRadolanHourlyValuesArray(radolan, timestampsHourly)
+    radolanDailyValuesArray.value = createRadolanDailyValuesArray(radolanHourlyValuesArray)
 
-      const { timestampsHourly, timestampsDaily } = createDatetimeArray()
+    const complete = ref(radolanDailyValuesArray.value.reduce((a, b) => a + b, 0))
 
-      const radolanHourlyValuesArray = createRadolanHourlyValuesArray(radolan, timestampsHourly)
-      const radolanDailyValuesArray = createRadolanDailyValuesArray(radolanHourlyValuesArray)
-
-      // eslint-disable-next-line
-      const myChart = new Chart(chart.value!, {
-        type: "bar",
-        data: {
-          labels: timestampsDaily,
-          datasets: [
-            {
-              type: "line",
-              data: radolanDailyValuesArray,
-              borderColor: "blue",
-              fill: false
-            },
-            {
-              type: "bar",
-              data: radolanDailyValuesArray,
-              backgroundColor: "lightblue"
-            }
-          ]
-        },
-        options: {
-          title: {
-            display: true,
-            text: "Niederschlag in mm"
-          },
-          legend: { display: false }
-        }
-      });
-    });
-
-    return { chart };
+    return { gridId, timestampsDaily, radolanDailyValuesArray, complete };
   }
 });
 </script>
