@@ -18,6 +18,7 @@ module.exports = (app) => {
   app.get("/api/fields/get", FieldController.index)
   app.get("/api/fields/get/byid/:id", FieldController.getFieldById)
   app.get("/api/fields/get/area/:id", FieldController.getFieldAreaById)
+  app.get("/api/fields/get/byuserid/:userid", FieldController.getFieldByUserId)
   app.post("/api/fields/get/bygeom", FieldController.getFieldByGeom)
   app.post("/api/fields/post", FieldController.postField)
 
