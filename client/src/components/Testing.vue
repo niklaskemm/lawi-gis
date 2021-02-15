@@ -9,16 +9,20 @@ import { onMounted, defineComponent } from 'vue';
 import {
   getRadolanDataByFieldId
 } from "../utils/functions/getRadolanDataByFieldId";
+import {
+  createStartEndDateString
+} from "../utils/functions/helper/createStartEndDateString";
 
 export default defineComponent({
   name: "Testing",
 
   setup() {
     onMounted(async () => {
-      const fieldId = "94601639-7055-4bcc-abfe-90b8c1dc6cf9"
-      const startDate = ""
-      const endDate = ""
-      const result = await getRadolanDataByFieldId(fieldId, startDate, endDate)
+      const numberOfDays = 7;
+      const fieldId = "c128bfd3-40ec-480a-b215-d885c439a9f4"
+      const { startDateString, endDateString } = createStartEndDateString(numberOfDays)
+      const result = await getRadolanDataByFieldId(fieldId, startDateString, endDateString)
+      console.log(result)
     })
   }
 });
