@@ -1,3 +1,4 @@
+const AuthController = require("../utils/controllers/AuthController")
 const UserController = require("../utils/controllers/UserController")
 const RadolanController = require("../utils/controllers/RadolanController")
 const GridController = require("../utils/controllers/GridController")
@@ -5,6 +6,8 @@ const FieldController = require("../utils/controllers/FieldController")
 const MiscController = require("../utils/controllers/MiscController")
 
 module.exports = (app) => {
+  app.post("/api/login", AuthController.login)
+
   app.get("/api/radolan/get", RadolanController.index)
   app.get("/api/radolan/get/byid/:id", RadolanController.getDataById)
   app.post("/api/radolan/get/bygridid", RadolanController.getDataByGridId)
