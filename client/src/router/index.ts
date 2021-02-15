@@ -31,6 +31,12 @@ const routes: Array<RouteRecordRaw> = [
     name: "User",
     component: () => import("../views/user/_id/index.vue")
   },
+
+  {
+    path: "/user/:userId/fields",
+    name: "UserFields",
+    component: () => import("../views/user/_id/fields/index.vue")
+  },
   {
     path: "/field/:fieldId",
     name: "Field",
