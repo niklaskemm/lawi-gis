@@ -2,7 +2,7 @@
 
 <template>
   <div>
-    <h1>{{ $route.params.userId }}</h1>
+    <h1>{{ userId }}</h1>
   </div>
 </template>
 
@@ -16,7 +16,9 @@ export default defineComponent({
 
   setup() {
     const route = useRoute();
-    const gridId = route.params.userId;
+    const userId = ref(route.params.userId);
+
+    return { userId }
   }
 })
 </script>
