@@ -1,7 +1,5 @@
 <template>
-  <div>
-    <canvas ref="chart"></canvas>
-  </div>
+  <canvas ref="chart"></canvas>
 </template>
 
 <script lang="ts">
@@ -48,7 +46,8 @@ export default defineComponent({
             display: true,
             text: "Niederschlag in mm"
           },
-          legend: { display: false }
+          legend: { display: false },
+          maintainAspectRatio: false
         }
       });
     })
@@ -57,4 +56,5 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+</style>
