@@ -7,6 +7,7 @@ const MiscController = require("../utils/controllers/MiscController")
 
 module.exports = (app) => {
   app.post("/api/login", AuthController.login)
+  app.post("/api/register", AuthController.register)
 
   app.get("/api/radolan/get", RadolanController.index)
   app.get("/api/radolan/get/byid/:id", RadolanController.getDataById)

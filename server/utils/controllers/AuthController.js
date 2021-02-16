@@ -20,5 +20,16 @@ module.exports = {
       // res.send("Invalid email address! Please try again.")
       res.send("Invalid credentials! Please try again.")
     }
+  },
+
+  async register(req, res) {
+    try {
+      const user = await User.create(req.body.userInfo)
+      const token = jwt.sign({ id: user.id }, config.SECRET_KEY)
+      res.send({ token, user })
+    } catch (err) {
+      // res.send("Invalid email address! Please try again.")
+      res.send(err)
+    }
   }
 }
