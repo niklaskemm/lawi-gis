@@ -16,17 +16,23 @@ function round(value, precision = 0) {
 export async function getRadolanDataByFieldId(
   fieldId: string,
   startDateString: string,
-  endDateString: string
+  endDateString: string,
+  after = false
 ) {
-  const date = new Date()
-  const daysBefore = 14
-  const includeAfter = false
+  const startDate = new Date(startDateString)
+  const endDate = new Date(endDateString)
+  let eventDate = new Date(startDateString)
+  eventDate.setDate(startDate.getDate() + 14)
+  let daysBefore = 14
+
+  const includeAfter = after
 
   const { timestampsDaily, timestampsHourly } = createDatetimeArray(
-    date,
+    eventDate,
     daysBefore,
     includeAfter
   )
+
   const idPercent = await getPercentPerGrid(fieldId)
 
   const gridDataComplete = [] as any
@@ -67,6 +73,10 @@ export async function getRadolanDataByFieldId(
   const fieldHourly = [] as any
 
   let fieldComplete = 0
+
+  if (after) {
+    daysBefore += daysBefore
+  }
 
   for (let i = 0; i < daysBefore; i++) {
     fieldDaily.push(0)
