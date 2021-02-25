@@ -6,8 +6,9 @@
       <a href="#" id="popupCloser" class="popup-closer" @click="closePopup" />
       <div id="popupContent" class="popup-content">
         <!-- <p>Geom: {{ featureGeom }}</p> -->
-        <p>Name: </p>
+        <h3>Name: </h3>
         <input v-model="fieldName" name="fieldName" />
+        <br />
         <button @click="deleteFeature">Delete Field</button>
         <button @click="saveFeature">Save Field</button>
       </div>
@@ -47,6 +48,9 @@ import FieldService from "../utils/services/FieldService";
 
 import { BingMapsApiKey } from "../../src/api_key_config.js";
 
+import { useStore } from "vuex";
+import { useRouter } from "vue-router"
+
 export default defineComponent({
   name: "DrawMap",
   props: {
@@ -65,6 +69,8 @@ export default defineComponent({
   },
 
   setup(props) {
+    const store = useStore()
+    const router = useRouter()
     let map;
 
     // const layerOSM = new TileLayer({
@@ -146,11 +152,19 @@ export default defineComponent({
       const fieldGeomGeoJSON = JSON.parse(new GeoJSON().writeFeature(feature, {
         featureProjection: "EPSG:3857"
       }));
-      const info = {
+      const field = {
         "name": fieldName.value,
         "geom": fieldGeomGeoJSON.geometry
       };
-      await FieldService.postField(info);
+      const user = store.getters.getUser
+      await FieldService.postField(field, user);
+
+      router.push({
+        name: 'User',
+        params: {
+          userId: user.id
+        }
+      })
     }
 
     function deleteFeature() {
@@ -225,11 +239,11 @@ export default defineComponent({
   height: 80%;
 }
 
-button {
-  position: absolute;
-  z-index: 10;
-  bottom: 10vh;
-}
+// button {
+//   position: absolute;
+//   z-index: 10;
+//   bottom: 10vh;
+// }
 
 .popup-container {
   position: absolute;
@@ -241,7 +255,7 @@ button {
   bottom: 12px;
   left: -10px;
   right: -10px;
-  min-width: 150px;
+  min-width: 200px;
   max-width: 80vw;
 }
 
@@ -275,5 +289,8 @@ button {
 }
 .popup-closer:after {
   content: "✖";
+}
+
+.popup-content {
 }
 </style>
