@@ -3,16 +3,16 @@
     <div v-if="throwError">{{ error }}</div>
     <br>
     <form @submit="registerUser">
-      <input tpye="email" placeholder="E-Mail" v-model="emailInput" />
+      <input required tpye="email" placeholder="E-Mail" v-model="emailInput" />
       <br>
       <br>
-      <input placeholder="Firstname" v-model="firstnameInput" />
+      <input required placeholder="Firstname" v-model="firstnameInput" />
       <br>
       <br>
-      <input placeholder="Lastname" v-model="lastnameInput" />
+      <input required placeholder="Lastname" v-model="lastnameInput" />
       <br>
       <br>
-      <input type="password" placeholder="Password" v-model="passwordInput" />
+      <input required type="password" placeholder="Password" v-model="passwordInput" />
       <br>
       <br>
       <button type="submit">Register</button>
@@ -23,15 +23,17 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
 import { useRouter, useRoute } from 'vue-router'
+import { useStore } from "vuex"
 import {
   register
 } from "../utils/functions/register";
 
 export default defineComponent({
-  name: "Register",
+  name: "RegisterComponent",
 
   async setup() {
     const router = useRouter()
+    const store = useStore()
 
     const emailInput = ref()
     const passwordInput = ref()
@@ -43,17 +45,20 @@ export default defineComponent({
 
     async function registerUser(e) {
       e.preventDefault()
-      const user = {
+      const response = await register({
         email: emailInput.value,
         firstname: firstnameInput.value,
         lastname: lastnameInput.value,
         password: passwordInput.value
-      }
-      const response = await register(user)
+      })
 
       try {
+        const user = response.response.data.user
         const token = response.response.data.token
         const { id } = response.response.data.user
+
+        store.commit("setUser", user)
+        store.commit("setToken", token)
 
         router.push({
           name: 'User',

@@ -3,10 +3,10 @@
     <div v-if="throwError">{{ error }}</div>
     <br>
     <form @submit="loginUser">
-      <input tpye="email" placeholder="E-Mail" v-model="emailInput" />
+      <input required tpye="email" placeholder="E-Mail" v-model="emailInput" />
       <br>
       <br>
-      <input type="password" placeholder="Password" v-model="passwordInput" />
+      <input required type="password" placeholder="Password" v-model="passwordInput" />
       <br>
       <br>
       <button type="submit">Login</button>
@@ -16,15 +16,17 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter } from 'vue-router';
+import { useStore } from "vuex";
 import {
   login
 } from "../utils/functions/login";
 
 export default defineComponent({
-  name: "Login",
+  name: "LoginComponent",
 
   async setup() {
+    const store = useStore()
     const router = useRouter()
 
     const emailInput = ref()
@@ -38,8 +40,12 @@ export default defineComponent({
       const response = await login(emailInput.value, passwordInput.value)
 
       try {
+        const user = response.response.data.user
         const token = response.response.data.token
-        const { id, email, firstname, lastname } = response.response.data.user
+        const { id } = response.response.data.user
+
+        store.commit("setUser", user)
+        store.commit("setToken", token)
 
         router.push({
           name: 'User',
