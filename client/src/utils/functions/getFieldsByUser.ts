@@ -1,8 +1,7 @@
 import FieldService from "../services/FieldService"
-import { stringify } from "wkt"
 
-export async function getFieldByGeom(userId) {
-  const response = await FieldService.getFieldByGeom(userId)
+export async function getFieldsByUser(userId) {
+  const response = await FieldService.getFieldsByUser(userId)
 
   return { response }
 }
