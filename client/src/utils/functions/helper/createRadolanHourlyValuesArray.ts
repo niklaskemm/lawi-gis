@@ -19,7 +19,7 @@ export function createRadolanHourlyValuesArray(
     for (const i of radolanValuesArray) {
       if (i.time == element) {
         radolanHourlyValuesArray.pop()
-        radolanHourlyValuesArray.push(i.value)
+        radolanHourlyValuesArray.push(i.value / 10)
       }
     }
   })
