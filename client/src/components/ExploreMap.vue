@@ -131,6 +131,8 @@ export default defineComponent({
           radolanValue14.value += element.value
         })
 
+        radolanValue14.value = radolanValue14.value / 10
+
         const centroid = new GeoJSON().readFeature(
           grid.centroid, { featureProjection: "EPSG:3857" }
         );
