@@ -63,7 +63,7 @@ export default defineComponent({
       const temp = [] as any
       temp.push(timestampArray[x])
       for (let y = 0; y < (props.data.length / 24); y++) {
-        temp.push(Math.round((props.data[(y * 24) + x] * 10) / 10).toString())
+        temp.push(props.data[(y * 24) + x].toString())
       }
       temp.push(timestampArray[x])
       data.push(temp)
@@ -98,25 +98,35 @@ export default defineComponent({
       cols.push({
         name: `${date}.${month}.`,
         attributes: (cell) => {
-          const value = parseInt(cell);
+          const value = parseFloat(cell);
           if (value == 0) {
             return returnStyle("white")
-          } else if (value > 0 && value < 1) {
-            return returnStyle("#ADE8F4")
+          } else if (value == 0.1) {
+            return returnStyle("#FCFDC1")
+          } else if (value >= 0.2 && value < 0.5) {
+            return returnStyle("#FBFC5C")
+          } else if (value >= 0.5 && value < 1) {
+            return returnStyle("#DFFC26")
           } else if (value >= 1 && value < 2) {
-            return returnStyle("#90E0EF")
+            return returnStyle("#A0D626")
           } else if (value >= 2 && value < 5) {
-            return returnStyle("#48CAE4")
+            return returnStyle("#45C379")
           } else if (value >= 5 && value < 10) {
-            return returnStyle("#00B4D8")
+            return returnStyle("#38D6D8")
           } else if (value >= 10 && value < 15) {
-            return returnStyle("#0096C7")
+            return returnStyle("#1EA1D6")
           } else if (value >= 15 && value < 25) {
-            return returnStyle("#0077B6")
+            return returnStyle("#1030FC")
           } else if (value >= 25 && value < 40) {
-            return returnStyle("#023E8A")
-          } else if (value >= 40 && value < 1000) {
-            return returnStyle("#03045E")
+            return returnStyle("#9232B7")
+          } else if (value >= 40 && value < 60) {
+            return returnStyle("#DA28C6")
+          } else if (value >= 60 && value < 80) {
+            return returnStyle("#E70C0C")
+          } else if (value >= 80 && value < 100) {
+            return returnStyle("#880F0D")
+          } else if (value >= 100) {
+            return returnStyle("#4F0E0D")
           }
         }
       })
@@ -147,9 +157,9 @@ export default defineComponent({
         }
       }).render(table.value!)
 
-      myTable.on('cellClick', (...args) => {
-        console.log(args[3].cells[0].data)
-      })
+      // myTable.on('cellClick', (...args) => {
+      //   console.log(args[3].cells[0].data)
+      // })
     })
 
     return { table }
