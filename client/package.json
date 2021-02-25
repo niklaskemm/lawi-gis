@@ -10,7 +10,7 @@
   "dependencies": {
     "axios": ">=0.21.1",
     "chart.js": "^2.9.4",
-    "core-js": "^3.8.3",
+    "core-js": "^3.9.0",
     "gridjs": "^3.3.0",
     "gridjs-vue": "^3.2.3",
     "jsonwebtoken": "^8.5.1",
@@ -20,14 +20,16 @@
     "register-service-worker": "^1.7.2",
     "sass-loader": "^10.1.1",
     "vue": "^3.0.5",
-    "vue-router": "^4.0.3",
+    "vue-router": "^4.0.4",
     "vuex": "^4.0.0",
+    "vuex-composition-helpers": "^1.0.22",
+    "vuex-persistedstate": "^4.0.0-beta.3",
     "wkt": "^0.1.1"
   },
   "devDependencies": {
     "@types/axios": "^0.14.0",
     "@types/geojson": "^7946.0.7",
-    "@types/node": "^14.14.28",
+    "@types/node": "^14.14.31",
     "@types/ol": "^6.4.2",
     "@types/sequelize": "^4.28.9",
     "@typescript-eslint/eslint-plugin": "^2.33.0",
