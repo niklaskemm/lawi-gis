@@ -5,8 +5,8 @@ export default {
   //   return Api().post("/api/fields/get/bygeom", { filter, geom })
   // },
 
-  postField(field) {
-    return Api().post("/api/fields/post", field)
+  postField(field, user) {
+    return Api().post("/api/fields/post", { field, user })
   },
 
   getFields() {

@@ -1,5 +1,6 @@
 const db = require("../../database/models/index")
 const Field = require("../../database/models").field
+const User = require("../../database/models").user
 
 module.exports = {
   async index(req, res) {
@@ -31,11 +32,14 @@ module.exports = {
   },
 
   async getFieldByUserId(req, res) {
-    const { userId } = req.params
+    const { userid } = req.params
     try {
       const fields = await Field.findAll({
-        where: {
-          user_id: userId
+        include: {
+          model: User,
+          where: {
+            id: userid
+          }
         }
       })
       if (fields) {
@@ -45,7 +49,7 @@ module.exports = {
       }
     } catch (err) {
       if ((err.name = "SequelizeDatabaseError")) {
-        res.status(400).send(`Invalid input syntax for geom: "${geom}"`)
+        res.status(400).send(`Invalid input syntax for: "${userId}"`)
       } else {
         res.status(503).send({ error: err })
       }
@@ -94,8 +98,17 @@ module.exports = {
 
   async postField(req, res) {
     try {
-      const field = await Field.create(req.body)
-      res.send(field)
+      const { field, user } = req.body
+      const creator = await User.findByPk(user.id)
+      const newField = await Field.create(field)
+      await creator.addField(newField)
+      const result = await User.findOne({
+        where: {
+          id: user.id
+        },
+        include: Field
+      })
+      res.send(result)
     } catch (err) {
       if ((err.name = "SequelizeDatabaseError")) {
         res.status(400).send(`Invalid input syntax: ${req.body}`)
