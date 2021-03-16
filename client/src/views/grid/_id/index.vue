@@ -90,7 +90,7 @@ export default defineComponent({
       complete += value
     })
 
-    Math.round(complete)
+    complete = Math.round(complete * 10) / 10
 
     return {
       gridId,
