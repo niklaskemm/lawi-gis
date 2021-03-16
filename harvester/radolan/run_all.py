@@ -8,6 +8,7 @@ from vectorize import vectorize_data
 
 
 def run_all():
+    cleanup()
     download_data()
     unpack_data()
     crop_data()
