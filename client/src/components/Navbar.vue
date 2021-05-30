@@ -2,12 +2,14 @@
   <nav class="navbar">
     <ul class="navbar__list">
       <li class="navbar__item">
-        <router-link class="navbar__link" to="/">Home</router-link>
+        <router-link class="navbar__link" to="/">
+          <div class="logo">LaWiGIS</div>
+        </router-link>
       </li>
-      <li class="navbar__item">
+      <li v-if="store.getters.getToken" class="navbar__item">
         <router-link class="navbar__link" to="/explore">Explore</router-link>
       </li>
-      <li class="navbar__item">
+      <li v-if="store.getters.getToken" class="navbar__item">
         <router-link class="navbar__link" to="/about">About</router-link>
       </li>
       <li v-if="!store.getters.getToken" class="navbar__item">
@@ -58,16 +60,16 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+@import url("https://fonts.googleapis.com/css2?family=Bungee+Shade&display=swap");
 .navbar {
-  position: fixed;
+  position: sticky;
   z-index: 10;
   background: white;
-  bottom: 0;
+  top: 0;
   left: 0;
   width: 100%;
 
   & .navbar__list {
-    padding: 0;
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
@@ -79,16 +81,24 @@ export default defineComponent({
         font-weight: lighter;
         color: #2c3e50;
         text-decoration: none;
+
+        // & .logo {
+        //   font-family: Bungee Shade;
+        //   font-style: normal;
+        //   font-weight: normal;
+        //   font-size: 32px;
+        //   height: 32px;
+        // }
       }
     }
   }
 }
 
-@media (min-width: 1000px) {
-  .navbar {
-    position: sticky;
-    bottom: unset;
-    top: 0;
-  }
-}
+// @media (min-width: 1000px) {
+//   .navbar {
+//     position: sticky;
+//     bottom: unset;
+//     top: 0;
+//   }
+// }
 </style>

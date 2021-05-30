@@ -1,6 +1,13 @@
 <template>
   <div>
-    <explore-map :centerLon="centerLon" :centerLat="centerLat" :zoom="zoom" />
+    <div class="main-container">
+      <h1>Tob' dich aus!</h1>
+      <h3>Klicke einfach irgendwo in Schleswig-Holstein</h3>
+      <h3>Anschließend kannst du dir die genaue Niederschlagsverteilung der letzten zwei Wochen dort ansehen</h3>
+    </div>
+    <div class="map-container">
+      <explore-map :centerLon="centerLon" :centerLat="centerLat" :zoom="zoom" />
+    </div>
   </div>
 </template>
 
@@ -24,4 +31,14 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.main-container {
+  width: 50%;
+  margin: 0 auto;
+}
+// .map-container {
+//   position: relative;
+//   width: 100%;
+//   bottom: 0;
+// }
+</style>

@@ -1,6 +1,13 @@
 <template>
   <div>
-    <h1>This is the Home page.</h1>
+    <div class="main-container">
+      <h1>Niederschlagsdaten des Deutschen Wetterdienstes</h1>
+      <h3>Stündliche, millimetergenaue Niederschlagsdaten für jedes Feld, jedes Grundstück und jeden Schlag</h3>
+      <router-link to="/about"><button class="btn">Worum geht's?</button></router-link>
+      <br />
+      <router-link to="/explore"><button class="btn">Explore</button>
+      </router-link>
+    </div>
   </div>
 </template>
 
@@ -14,4 +21,13 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.main-container {
+  margin: 0 auto;
+  width: 50%;
+}
+
+.btn {
+  cursor: pointer;
+}
+</style>

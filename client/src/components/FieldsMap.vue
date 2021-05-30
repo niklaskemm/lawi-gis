@@ -127,6 +127,11 @@ export default defineComponent({
         maxZoom: 18
       })
 
+      function round(value, precision = 0) {
+        const multiplier = Math.pow(10, precision)
+        return Math.round(value * multiplier) / multiplier
+      }
+
       map.on("click", function (event) {
         try {
           map.forEachFeatureAtPixel(event.pixel, async function (feature) {
@@ -144,7 +149,7 @@ export default defineComponent({
               endDateString
             )
 
-            radolanValue14.value = radolan.complete / 10
+            radolanValue14.value = round(radolan.complete / 10, 1)
             fieldName.value = field.name
             fieldIdClicked.value = field.id
 
@@ -172,9 +177,14 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .map {
-  position: absolute;
-  width: 100%;
-  height: 100%;
+  position: relative;
+  border-radius: 15px;
+  width: 90vw;
+  height: 50vh;
+  // top: 10vh;
+  // bottom: 5vh;
+  margin: 0 auto;
+  overflow: hidden;
 }
 
 .popup-container {

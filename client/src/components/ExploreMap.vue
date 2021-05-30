@@ -170,9 +170,14 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .map {
-  position: absolute;
-  width: 100%;
-  height: 100%;
+  position: relative;
+  border-radius: 15px;
+  width: 90vw;
+  height: 50vh;
+  // top: 10vh;
+  // bottom: 5vh;
+  margin: 0 auto;
+  overflow: hidden;
 }
 
 .popup-container {

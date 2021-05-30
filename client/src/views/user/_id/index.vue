@@ -2,10 +2,11 @@
 
 <template>
   <div class="body">
-    <h1>{{ user.firstname }} {{ user.lastname }}</h1>
+    <h1>Hey {{ user.firstname }}! </h1>
     <router-link to="/drawmap">
       <button>Add Field</button>
     </router-link>
+
     <div class="fields__container">
       <div class="field__card" v-for="field in fields" :key="field.id">
         <h3> {{ field.name }}</h3>
@@ -63,17 +64,17 @@ export default defineComponent({
   align-items: center;
   width: 90vw;
 }
-.map__container {
-  position: relative;
-  height: 40vh;
-  width: 100vw;
-}
+// .map__container {
+//   position: relative;
+//   height: 40vh;
+//   width: 100vw;
+// }
 .field__card {
-  width: 20vw;
+  width: 18vw;
   height: 15vh;
   background: lightgray;
   border: 1px grey solid;
-  border-radius: 5px;
-  margin: 2vh;
+  border-radius: 15px;
+  margin: 1vh;
 }
 </style>
