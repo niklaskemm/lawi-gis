@@ -74,12 +74,13 @@ export default defineComponent({
       day: "2-digit"
     }
 
-    function returnStyle(color) {
+    function returnStyle(color, textfont) {
       return {
         "style": {
           "background": color,
           "text-align": "center",
           "font-size": "16px",
+          "color": textfont,
           "width": "20px",
           "overflow": "hidden",
           "white-space": "nowrap",
@@ -100,33 +101,33 @@ export default defineComponent({
         attributes: (cell) => {
           const value = parseFloat(cell);
           if (value == 0) {
-            return returnStyle("white")
+            return returnStyle("#FFF", "black")
           } else if (value == 0.1) {
-            return returnStyle("#FCFDC1")
+            return returnStyle("#CAF0F8", "black")
           } else if (value >= 0.2 && value < 0.5) {
-            return returnStyle("#FBFC5C")
+            return returnStyle("#90E0EF", "black")
           } else if (value >= 0.5 && value < 1) {
-            return returnStyle("#DFFC26")
+            return returnStyle("#00D6D8", "black")
           } else if (value >= 1 && value < 2) {
-            return returnStyle("#A0D626")
+            return returnStyle("#00B4D8", "black")
           } else if (value >= 2 && value < 5) {
-            return returnStyle("#45C379")
+            return returnStyle("#0077B6", "white")
           } else if (value >= 5 && value < 10) {
-            return returnStyle("#38D6D8")
+            return returnStyle("#03045E", "white")
           } else if (value >= 10 && value < 15) {
-            return returnStyle("#1EA1D6")
+            return returnStyle("#FFBA08", "white")
           } else if (value >= 15 && value < 25) {
-            return returnStyle("#1030FC")
+            return returnStyle("#F48C06", "white")
           } else if (value >= 25 && value < 40) {
-            return returnStyle("#9232B7")
+            return returnStyle("#E85D04", "white")
           } else if (value >= 40 && value < 60) {
-            return returnStyle("#DA28C6")
+            return returnStyle("#DC2F02", "white")
           } else if (value >= 60 && value < 80) {
-            return returnStyle("#E70C0C")
+            return returnStyle("#D00000", "white")
           } else if (value >= 80 && value < 100) {
-            return returnStyle("#880F0D")
+            return returnStyle("#9D0208", "white")
           } else if (value >= 100) {
-            return returnStyle("#4F0E0D")
+            return returnStyle("#6A040F", "white")
           }
         }
       })
