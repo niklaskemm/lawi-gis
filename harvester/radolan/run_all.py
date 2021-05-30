@@ -14,7 +14,7 @@ def run_all():
     crop_data()
     vectorize_data()
     create_dataframe()
-    cleanup()
+    # cleanup()
     print("Done!")
 
 

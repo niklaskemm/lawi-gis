@@ -1,3 +1,10 @@
+#
+# This script is in part based on prior works by the CityLAB Berlin and their "Gieß den Kiez" project
+# (https://github.com/technologiestiftung/giessdenkiez-de-dwd-harvester/blob/master/harvester/harvester.py)
+# as well as an introductory script for working with RADOLAN data presented at Carto Hack 2020 by
+# Sebastian Meier (https://colab.research.google.com/drive/1tqc5jBqMXPdP6j1FjmJXkXEToJw9mgRo?usp=sharing)
+#
+
 import os
 import gdal
 
