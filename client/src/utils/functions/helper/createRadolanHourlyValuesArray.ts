@@ -1,3 +1,8 @@
+function round(value, precision = 0) {
+  const multiplier = Math.pow(10, precision)
+  return Math.round(value * multiplier) / multiplier
+}
+
 export function createRadolanHourlyValuesArray(
   radolanValuesArray,
   datetimeArray
@@ -19,7 +24,7 @@ export function createRadolanHourlyValuesArray(
     for (const i of radolanValuesArray) {
       if (i.time == element) {
         radolanHourlyValuesArray.pop()
-        radolanHourlyValuesArray.push(i.value / 10)
+        radolanHourlyValuesArray.push((round((i.value / 10), 1)))
       }
     }
   })

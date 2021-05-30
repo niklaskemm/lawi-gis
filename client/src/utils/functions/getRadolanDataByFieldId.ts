@@ -22,7 +22,7 @@ export async function getRadolanDataByFieldId(
   const startDate = new Date(startDateString)
   const endDate = new Date(endDateString)
   let eventDate = new Date(startDateString)
-  eventDate.setDate(startDate.getDate() + 14)
+  eventDate.setDate(startDate.getDate() + 15)
   let daysBefore = 14
 
   const includeAfter = after
@@ -95,7 +95,7 @@ export async function getRadolanDataByFieldId(
     }
 
     gridDailyWeighted.forEach((value, index) => {
-      fieldDaily[index] += round(value, 4)
+      fieldDaily[index] += round(value, 1)
     })
 
     const gridHourlyWeighted = [] as any
@@ -105,6 +105,10 @@ export async function getRadolanDataByFieldId(
 
     gridHourlyWeighted.forEach((value, index) => {
       fieldHourly[index] += round(value, 1)
+    })
+
+    fieldHourly.forEach((value, index) => {
+      fieldHourly[index] = round(fieldHourly[index], 1)
     })
   }
 

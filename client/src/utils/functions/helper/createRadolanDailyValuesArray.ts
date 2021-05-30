@@ -12,7 +12,7 @@ export function createRadolanDailyValuesArray(radolanHourlyValuesArray) {
     for (let j = 0; j < 24; j++) {
       sumDaily += radolanHourlyValuesArray[i * 24 + j]
     }
-    radolanDailyValuesArray.push(round(sumDaily, 4))
+    radolanDailyValuesArray.push(round(sumDaily, 1))
   }
   return radolanDailyValuesArray
 }
