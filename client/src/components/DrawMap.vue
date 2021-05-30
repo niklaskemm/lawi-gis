@@ -1,5 +1,6 @@
 <template>
   <div>
+    <button class="button" @click="startDraw">Zeichnen beginnen</button>
     <div id="map" class="map"></div>
     <div id="popupContainer" class="popup-container" ref="popupContainer">
       <!-- TODO add closePopup function -->
@@ -9,11 +10,10 @@
         <h3>Name: </h3>
         <input v-model="fieldName" name="fieldName" />
         <br />
-        <button @click="deleteFeature">Delete Field</button>
-        <button @click="saveFeature">Save Field</button>
+        <button @click="deleteFeature">Löschen </button>
+        <button @click="saveFeature">Speichern</button>
       </div>
     </div>
-    <button @click="startDraw">Start Drawing</button>
   </div>
 </template>
 
@@ -234,16 +234,21 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .map {
-  position: absolute;
-  width: 100%;
-  height: 80%;
+  position: relative;
+  border-radius: 15px;
+  width: 90vw;
+  height: 50vh;
+  // top: 10vh;
+  // bottom: 5vh;
+  margin: 0 auto;
+  overflow: hidden;
 }
 
-// button {
-//   position: absolute;
-//   z-index: 10;
-//   bottom: 10vh;
-// }
+.button {
+  position: relative;
+  z-index: 10;
+  top: 10vh;
+}
 
 .popup-container {
   position: absolute;
@@ -289,8 +294,5 @@ export default defineComponent({
 }
 .popup-closer:after {
   content: "✖";
-}
-
-.popup-content {
 }
 </style>

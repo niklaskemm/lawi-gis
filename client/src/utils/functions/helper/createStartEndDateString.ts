@@ -10,7 +10,7 @@ export function createStartEndDateString(
   let endDateString = ""
 
   if (date1 === false && date2 === false) {
-    endDate.setDate(endDate.getDate() - 1)
+    endDate.setDate(endDate.getDate())
     endDateString = endDate.toISOString().split("T")[0]
 
     startDate.setDate(startDate.getDate() - numberOfDays)
